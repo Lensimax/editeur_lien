@@ -98,8 +98,6 @@ for (j=0; j<header.e_shnum; j++){
 
 		printf("[*] Link : %x\n", Shtab[j].sh_link);
 
-		printf("[*] Offset : %d\n", Shtab[j].sh_offset);
-
 		switch (Shtab[j].sh_type) {
 			case 2: case 11: printf("[*] Info : index %x of the relocation\n",Shtab[j].sh_info); break;
 			case 4: case 9: printf("[*] Info : index %x of last local symbol+1\n",Shtab[j].sh_info); break;
