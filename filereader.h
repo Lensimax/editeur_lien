@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-char* readFileBytes(const char *name);
+unsigned char* readFileBytes(const char *name);
 
 #endif
 

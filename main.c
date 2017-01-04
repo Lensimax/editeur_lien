@@ -8,6 +8,7 @@
 
 int main(int argc, char * argv[]){
 
+	readHeader("vecteur.o",1);
 
 return 0;
 }

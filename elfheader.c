@@ -7,8 +7,6 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	int isValid = 1;
 	unsigned int first;
     unsigned int second;
-    unsigned int third;
-	unsigned int fourth;
 	unsigned int sum;
 	unsigned char* fileBytes = readFileBytes(filePath);
 
@@ -30,33 +28,29 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	int i = 4;
 
 	if(isValid == 1) {
-		first = fileBytes[i];
-		second = fileBytes[i+1];
-		sum = first * 16 + second;
-		if(sum==1){
+		
+		if(fileBytes[i]==1){
 			if(isVerbose == 1)
 				printf("[*] Classe : 32 Bits ELFCLASS32\n");
 		}
 		else {
 			if(isVerbose == 1)
-				printf("[E] Classe invalide\n");
+				printf("[E] Classe : Invalide\n");
 			isValid = 0;
 		}
-		header.e_ident[EI_CLASS] = sum;
+		header.e_ident[EI_CLASS] = fileBytes[i];
 	}
 	
-	i+=2;
+	i++;
 
 	if(isValid == 1) {
 
-		first = fileBytes[i];
-		second = fileBytes[i+1];
-		sum = first * 16 + second;
-		if(sum==1){
+		
+		if(fileBytes[i]==1){
 			if(isVerbose == 1)
 				printf("[*] EI_DATA : LSB Little endian\n");
 		}
-		else if(sum==2){
+		else if(fileBytes[i]==2){
 			if(isVerbose == 1)
 				printf("[*] EI_DATA : MSB Big endian\n");
 		
@@ -66,49 +60,46 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 				printf("[E] Erreur de lecture de l'encodage EI_DATA\n");
 		isValid = 0;
 		}
-		header.e_ident[EI_DATA] = sum;
+		header.e_ident[EI_DATA] = fileBytes[i];
 	}
 	
-	i+=2;
+	i++;
 
 	if(isValid == 1) {
-		first = fileBytes[i];
-		second = fileBytes[i+1];
-		sum = first * 16 + second;
-		if(sum!=0){
+		
+		if(fileBytes[i]!=0){
 			if(isVerbose == 1)
-				printf("[*] Version du header : %d\n",sum);
+				printf("[*] Version du header : %d\n",fileBytes[i]);
 		}
 		else {
 			if(isVerbose == 1)
 				printf("[E] Version du header invalide");
 			isValid = 0;
 		}
-		header.e_ident[EI_VERSION] = sum;
+		header.e_ident[EI_VERSION] = fileBytes[i];
 	}
 
-	i+=2;
+	i++;
+
 	if(isValid == 1) {
-		first = fileBytes[i];
-		second = fileBytes[i+1];
-		sum = first * 16 + second;
-		if(sum== 0){
+		
+		if(fileBytes[i]== 0){
 			if(isVerbose == 1)
 				printf("[*] ABI : UNIX SYSTEM V\n");
 		}
-		else if (sum == 3) {
+		else if (fileBytes[i] == 3) {
 			if(isVerbose == 1)
 				printf("[*] ABI : LINUX\n");
 		}
-		else if (sum == 7) {
+		else if (fileBytes[i] == 7) {
 			if(isVerbose == 1)
 				printf("[*] ABI : IBM AIX\n");
 		}
-		else if (sum == 64) {
+		else if (fileBytes[i] == 64) {
 			if(isVerbose == 1)
 				printf("[*] ABI : ARM EABI\n");
 		}
-		else if (sum == 97) {
+		else if (fileBytes[i] == 97) {
 			if(isVerbose == 1)
 				printf("[*] ABI : ARM\n");
 		}
@@ -117,52 +108,48 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 				printf("[W] ABI : INCONNU\n");
 		}
 		
-		header.e_ident[EI_VERSION] = sum;
+		header.e_ident[EI_VERSION] = fileBytes[i];
 	}
 
-		i=32; /////////////////////////////////////////////
+	i=16; 
 
 	if(isValid == 1) {
 		first = fileBytes[i];
 		second = fileBytes[i+1];
-		third = fileBytes[i+2];
-		fourth = fileBytes[i+3];
-		sum = first * 16 * 16 * 16 + second * 16 * 16 + third * 16 + fourth;
+		sum = first * 16 * 16 + second;
 		if(sum == 0){
 			if(isVerbose == 1)
-				printf("[*] Pas de type de fichiers");
+				printf("[*] Pas de type de fichiers\n");
 		}
 		else if (sum ==1){
 			if(isVerbose == 1)
-				printf("[*] Type du fichier : Relocatable file");
+				printf("[*] Type du fichier : Relocatable file\n");
 		}
 		else if (sum ==2){
 			if(isVerbose == 1)
-				printf("[*] Type du fichier : Fichier executable");
+				printf("[*] Type du fichier : Fichier executable\n");
 		}
 		else if (sum==3){
 			if(isVerbose == 1)
-				printf("[*] Type du fichier : Fichier partagé");
+				printf("[*] Type du fichier : Fichier partagé\n");
 		}
 		else if (sum ==4){
 			if(isVerbose == 1)
-				printf("[*] Type du fichier : Core file");
+				printf("[*] Type du fichier : Core file\n");
 		}
 		else {
 			if(isVerbose == 1)
-				printf("[W] Type du fichier : Inconnu");
+				printf("[W] Type du fichier : Inconnu\n");
 		}
 		header.e_type = sum;
 	}
 	
-		i+=4; ////////////////////////////////////////////////
+	i+=2; ////////////////////////////////////////////////
 	
 	if(isValid == 1){
 		first = fileBytes[i];
 		second = fileBytes[i+1];
-		third = fileBytes[i+2];
-		fourth = fileBytes[i+3];
-		sum = first * 16 * 16 * 16 + second * 16 * 16 + third * 16 + fourth;
+		sum = first * 16 * 16 + second;
         if(isVerbose == 1){
             if(sum == 0){
                 printf("[*] Aucune machine cible\n");
@@ -204,10 +191,10 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	header.e_machine = sum;
 	}
 
-		i+=4; ////////////////////////////////////////////////
+	i+=2; ////////////////////////////////////////////////
 
 	if(isValid == 1){
-		sum = fileBytes[i]*16*16*16*16*16*16*16 + fileBytes[i+1]*16*16*16*16*16*16 + fileBytes[i+2]*16*16*16*16*16 + fileBytes[i+3]*16*16*16*16+fileBytes[i+4]*16*16*16+fileBytes[i+5]*16*16+fileBytes[i+6]*16+fileBytes[i+7];
+		sum = fileBytes[i]*16*16*16*16*16*16 + fileBytes[i+1]*16*16*16*16 + fileBytes[i+2]*16*16 + fileBytes[i+3];
 		if(sum == 0){
         	if(isVerbose == 1)
 				printf("[E] Version invalide\n");
@@ -215,7 +202,7 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 		}
 		else if(sum == 1){
 			if(isVerbose == 1)
-				printf("[*] Version courrante\n");
+				printf("[*] Version : 0x%x\n",sum);
 	
 		}
 		else {
@@ -225,16 +212,10 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 
 	}
 
-		i+=8; ///////////////////////////////////////////
+	i+=4; ///////////////////////////////////////////
 
 	if(isValid == 1){
-		unsigned int first = fileBytes[i];
-        unsigned int second = fileBytes[i+1];
-        unsigned int third = fileBytes[i+2];
-		unsigned int fourth = fileBytes[i+3];
-		unsigned int sum;
-		
-		sum = first * 16 * 16 * 16 * 16 * 16 * 16 + second * 16 * 16 * 16 * 16 + third * 16 * 16 + fourth; ////////////////////////////////////////
+		sum = fileBytes[i]*16*16*16*16*16*16 + fileBytes[i+1]*16*16*16*16 + fileBytes[i+2]*16*16 + fileBytes[i+3];
 
 		if(isVerbose == 1)
 				printf("[*] Point d'entrée : 0x%x\n",sum);
@@ -246,7 +227,104 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	i+=4;
 
 	if(isValid == 1){
+		sum = fileBytes[i]*16*16*16*16*16*16 + fileBytes[i+1]*16*16*16*16 + fileBytes[i+2]*16*16 + fileBytes[i+3];
 
+		if(isVerbose == 1)
+				printf("[*] Début des en-têtes de header : %d\n",sum);
+
+		header.e_phoff = sum;
+	
+		}
+
+	i+=4;
+
+	if(isValid == 1){
+		sum = fileBytes[i]*16*16*16*16*16*16 + fileBytes[i+1]*16*16*16*16 + fileBytes[i+2]*16*16 + fileBytes[i+3];
+		
+		if(isVerbose == 1)
+				printf("[*] Début des en-têtes de sections : %d\n",sum);
+
+		header.e_shoff = sum;
+	
+		}
+
+	i+=4;
+
+	if(isValid == 1){
+		sum = fileBytes[i]*16*16*16*16*16*16 + fileBytes[i+1]*16*16*16*16 + fileBytes[i+2]*16*16 + fileBytes[i+3];
+
+		if(isVerbose == 1)
+				printf("[*] Flags : 0x%x\n",sum);
+
+		header.e_flags = sum;
+	
+		}
+
+	i+=4;
+
+	if(isValid == 1){
+		first = fileBytes[i];
+		second = fileBytes[i+1];
+		sum = first * 16 * 16 + second;
+        if(isVerbose == 1)
+			printf("[*] Taille du header : %d\n",sum);
+	header.e_ehsize = sum;
+	}
+	i+=2;
+
+	if(isValid == 1){
+		first = fileBytes[i];
+		second = fileBytes[i+1];
+		sum = first * 16 * 16 + second;
+        if(isVerbose == 1)
+			printf("[*] Taille d'une entrée dans la table contenant l'entête de programme : %d\n",sum);
+	header.e_phentsize = sum;
+	}
+	i+=2;
+
+	if(isValid == 1){
+		first = fileBytes[i];
+		second = fileBytes[i+1];
+		sum = first * 16 * 16 + second;
+        if(isVerbose == 1)
+			printf("[*] Nombre d'entrées dans la table contenant l'entête de programme : %d\n",sum);
+	header.e_phnum = sum;
+	}
+	i+=2;
+
+	if(isValid == 1){
+		first = fileBytes[i];
+		second = fileBytes[i+1];
+		sum = first * 16 * 16 + second;
+        if(isVerbose == 1)
+			printf("[*] Taille d'une entrée dans la table des entêtes de sections  : %d\n",sum);
+	header.e_shentsize = sum;
+	}
+	i+=2;
+
+	if(isValid == 1){
+		first = fileBytes[i];
+		second = fileBytes[i+1];
+		sum = first * 16 * 16 + second;
+        if(isVerbose == 1)
+			printf("[*] Nombre d'entrées dans la table des entêtes de sections : %d\n",sum);
+	header.e_shnum = sum;
+	}
+	i+=2;
+
+	if(isValid == 1){
+		first = fileBytes[i];
+		second = fileBytes[i+1];
+		sum = first * 16 * 16 + second;
+        if(isVerbose == 1)
+			printf("[*] Indice des noms de sections : %d\n",sum);
+	header.e_shstrndx = sum;
+	}
+	
+	return header;
+
+}
+	
 
 
 
