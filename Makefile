@@ -7,7 +7,7 @@ main: main.o filereader.o elfheader.o
 %.o: %.c                          
 	$(CC) $(CFLAGS) -c $<
 
-main.o : filereader.h elfheader.h elfsection.h
+main.o : filereader.h elfheader.h elfsectiontab.h
 filereader.o: filereader.h
 elfheader.o: elfheader.h filereader.h
-elfsection.o: elfsection.h filereader.h
+elfsection.o: elfsectiontab.h filereader.h

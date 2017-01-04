@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 
 #include "elfheader.h"
-#include "elfsection.h"
+#include "elfsectiontab.h"
 
 int main(int argc, char * argv[]){
 
