@@ -194,7 +194,7 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	i+=2; ////////////////////////////////////////////////
 
 	if(isValid == 1){
-		sum = fileBytes[i]<<24 + fileBytes[i+1]<<16 + fileBytes[i+2]<<8 + fileBytes[i+3];
+		sum = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 		if(sum == 0){
         	if(isVerbose == 1)
 				printf("[E] Version invalide\n");
@@ -215,7 +215,7 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	i+=4; ///////////////////////////////////////////
 
 	if(isValid == 1){
-		sum = fileBytes[i]<<24 + fileBytes[i+1]<<16 + fileBytes[i+2]<<8 + fileBytes[i+3];
+		sum = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 
 		if(isVerbose == 1)
 				printf("[*] Point d'entrée : 0x%x\n",sum);
@@ -227,7 +227,7 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	i+=4;
 
 	if(isValid == 1){
-		sum = fileBytes[i]<<24 + fileBytes[i+1]<<16 + fileBytes[i+2]<<8 + fileBytes[i+3];
+		sum = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 
 		if(isVerbose == 1)
 				printf("[*] Début des en-têtes de header : %d\n",sum);
@@ -239,7 +239,7 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	i+=4;
 
 	if(isValid == 1){
-		sum = fileBytes[i]<<24 + fileBytes[i+1]<<16 + fileBytes[i+2]<<8 + fileBytes[i+3];
+		sum = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 		
 		if(isVerbose == 1)
 				printf("[*] Début des en-têtes de sections : %d\n",sum);
@@ -251,7 +251,7 @@ Elf32_Ehdr readHeader(char * filePath, int isVerbose){
 	i+=4;
 
 	if(isValid == 1){
-		sum = fileBytes[i]<<24 + fileBytes[i+1]<<16 + fileBytes[i+2]<<8 + fileBytes[i+3];
+		sum = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 
 		if(isVerbose == 1)
 				printf("[*] Flags : 0x%x\n",sum);
