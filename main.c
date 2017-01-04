@@ -9,12 +9,24 @@
 
 int main(int argc, char * argv[]){
 
-Elf32_Ehdr header;
+	Elf32_Ehdr *header;
+
+	header = malloc(sizeof(Elf32_Ehdr));
 
 
-	header = readHeader("example2.o",0);
-	readSectTab(header,"example2.o",1);
+	if(readHeader("example2.o", header)){
+		
+		aff_header(header);
+		
 
 
-return 0;
+
+
+
+
+		return 0;
+	} else {
+		return 1;
+	}
+
 }

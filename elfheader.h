@@ -4,4 +4,8 @@
 
 #include "filereader.h"
 
-Elf32_Ehdr readHeader(char * filePath, int isVerbose);
+
+
+void aff_header(Elf32_Ehdr *header);
+
+int readHeader(char *filePath, Elf32_Ehdr *header);
