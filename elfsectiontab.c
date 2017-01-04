@@ -8,6 +8,7 @@ Elf32_Shdr * Shtab = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
 Elf32_Half j;
 int ind_name;
 char name[256];
+int k;
 
 for (j=0; j<header.e_shnum; j++){
 	
@@ -48,12 +49,18 @@ for (j=0; j<header.e_shnum; j++){
 		
 		// Searching the name of the section
 		ind_name = header.e_shstrndx;
-		for (int k = 0; k < (int) Shtab[j].sh_name; k++) {
+		for (k = 0; k < (int) Shtab[j].sh_name; k++) {
 			while (fileBytes[ind_name] != '\0')
 				ind_name++;
 			ind_name++;
 		}
-		strcpy (name, &fileBytes[ind_name]);
+		//strcpy (name, &fileBytes[ind_name]);
+		k = 0;
+		while (fileBytes[ind_name-1] != '\0') {
+			name[k] = fileBytes[ind_name];
+			ind_name++;
+			k++;
+		}
 		// Displaying the name
 		printf("[*] Name of the section : %s\n", name);
 
