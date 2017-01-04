@@ -9,7 +9,12 @@
 
 int main(int argc, char * argv[]){
 
-	readHeader("vecteur.o",1);
+Elf32_Ehdr header;
+
+
+	header = readHeader("example2.o",0);
+	readSectTab(header,"example2.o",1);
+
 
 return 0;
 }
