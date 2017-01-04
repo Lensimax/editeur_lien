@@ -11,3 +11,5 @@ main.o : filereader.h elfheader.h elfsectiontab.h
 filereader.o: filereader.h
 elfheader.o: elfheader.h filereader.h
 elfsectiontab.o : elfsectiontab.h filereader.h
+clean:
+	rm elfsectiontab.o elfheader.o filereader.o main.o
