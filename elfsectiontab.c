@@ -2,7 +2,7 @@
 
 Elf32_Shdr * readSectTab(Elf32_Ehdr header, char * filePath, int isVerbose){
 
-Elf32_Addr i = header.e_entry + header.e_shoff ;//adresse de depart(0 par defaut) + décalage 
+Elf32_Addr i = /*header.e_entry*/ + header.e_shoff ;//adresse de depart(0 par defaut) + décalage 
 unsigned char* fileBytes = readFileBytes(filePath);
 Elf32_Shdr * Shtab = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
 Elf32_Half j;
@@ -42,25 +42,24 @@ for (j=0; j<header.e_shnum; j++){
 
 	Shtab[j].sh_entsize = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 	i = i+4;
-
+}
+for (j=0; j<header.e_shnum; j++){
 	if (isVerbose ) {
 
 		printf("[*] Name indice : %d\n",Shtab[j].sh_name);
 		
 		// Searching the name of the section
-		ind_name = header.e_shstrndx;
-		for (k = 0; k < (int) Shtab[j].sh_name; k++) {
-			while (fileBytes[ind_name] != '\0')
-				ind_name++;
-			ind_name++;
-		}
-		//strcpy (name, &fileBytes[ind_name]);
+		ind_name = Shtab[header.e_shstrndx].sh_offset;
 		k = 0;
-		while (fileBytes[ind_name-1] != '\0') {
-			name[k] = fileBytes[ind_name];
-			ind_name++;
-			k++;
+		
+		ind_name =  ind_name + Shtab[j].sh_name;
+		
+		while(fileBytes[ind_name] != '\0'){
+		name[k] = fileBytes[ind_name];
+		k++;
+		ind_name++;
 		}
+		name[k]='\0';
 		// Displaying the name
 		printf("[*] Name of the section : %s\n", name);
 

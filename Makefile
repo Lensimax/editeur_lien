@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror
+CFLAGS=-Wall -Werror -g
 
 main: main.o filereader.o elfheader.o elfsectiontab.o
 	$(CC) -o $@ $^
