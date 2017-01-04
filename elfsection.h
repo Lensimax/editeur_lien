@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <elf.h>
 
-#include "elfheader.h"
+#ifndef __FILE_READER__
+#define  __FILE_READER__
+#include "filereader.h"
+#endif
 
-Elf32_Shdr * readSectTab(Elf32_Ehdr header,char * filePath, int isVerbose);
+
+void affichage_section(char * filePath, Elf32_Shdr *tab);
