@@ -3,5 +3,8 @@
 #include <elf.h>
 #include <string.h>
 #include "filereader.h"
+#include "util.h"
 
-Elf32_Shdr * readSectTab(Elf32_Ehdr header,char * filePath, int isVerbose);
+int readSectTab(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath);
+
+void aff_Sheader(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath);
