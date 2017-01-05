@@ -30,7 +30,7 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, Elf32_Sym * Symta
 					k=k+8;
 					
 					if(isVerbose){
-						printf("[*] Offset : %x\n",Reltab[compt].st_offset); // Sûrement faux
+						printf("[*] Offset : %x\n",Reltab[compt].r_offset); // Sûrement faux
 						
 						// Searching the name of the section
 						ind_name = Shtab[header.e_shstrndx].sh_offset;
