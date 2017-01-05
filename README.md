@@ -22,7 +22,7 @@ Lecteur de fichier ;
 
 4.Affichage de la table des symboles et des détails relatifs à chaque symbole ;
 
-	elfsymtab.c //Verification à faire, pour le moment tous les symboles sont a zero ou inexistant sur les fichiers testés.
+	elfsymtab.c 
 	elfsymtab.h
 
 5.Affichage des tables de réimplantation et des détails relatifs à chaque entrée ;
