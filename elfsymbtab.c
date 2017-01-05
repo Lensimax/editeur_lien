@@ -1,55 +1,42 @@
 #include "elfsymbtab.h"
 
 
-int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char * filePath, int isVerbose){
+int readSymbtab(Elf32_Ehdr *header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char * filePath, int isVerbose){
+ 
+int j;
+unsigned char* fileBytes = readFileBytes(filePath);
+FILE *f;
 
+f = fopen(filePath, "r");
+int ind_name;
+char name[256];
+int compt = 0;
 
-	
-	
-	unsigned char* fileBytes = readFileBytes(filePath);
-	int ind_name;
-	char name[256];
-	int compt = 0;
-	if (Symtab != NULL){	//Si l'allocation reussi
-	
-		for (int j=0; j<header.e_shnum; j++){ // for each section
+if(f != NULL){
+	fseek(f, header->e_shoff, SEEK_SET);
+	for (j=0; j<header->e_shnum; j++){
 		
-			if (( Shtab[j].sh_type == 2 ) || ( Shtab[j].sh_type == 6 )){	//if symbols tab
+		if (( Shtab[j].sh_type == 2 ) || ( Shtab[j].sh_type == 6 )){
 			
-				int i = Shtab[j].sh_offset;		 // debut de la table de symboles
-				int k = 0; 
-				
-				while (k < header.e_shentsize){	// while not end of section
-					if (compt != 0){		//
-					Symtab = (Elf32_Sym * ) realloc(Symtab, sizeof(Symtab)+sizeof(Elf32_Sym));
+			int k =0;
+			while (k < header->e_shentsize){			
+				if (compt != 0){		//
+						Symtab = (Elf32_Sym * ) realloc(Symtab, sizeof(Symtab)+sizeof(Elf32_Sym));
 						if (Symtab == NULL){printf("[E] Echec realloc dans la table des symboles \n");return 0;}
-					}
-					Symtab[compt].st_name = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					Symtab[compt].st_value = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					Symtab[compt].st_size = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					Symtab[compt].st_info = fileBytes[i];
-					i++;
-					Symtab[compt].st_other = fileBytes[i];
-					i++;
-					Symtab[compt].st_shndx =(fileBytes[i]<<8) + fileBytes[i+1];
-					i=i+2;
-					k=k+16;
-					
-					if(isVerbose){
+						}
+				fread(&Symtab[compt], sizeof(Elf32_Sym), 1, f);
+				if(isVerbose){
 						printf("[*] Name indice : %d\n",Symtab[compt].st_name);
 		
 						// Searching the name of the section
-						ind_name = Shtab[header.e_shstrndx].sh_offset;
+						ind_name = Shtab[header->e_shstrndx].sh_offset;
 						int l = 0;
 		
 						ind_name =  ind_name + Symtab[compt].st_name;
 		
 						while(fileBytes[ind_name] != '\0'){
 						name[l] = fileBytes[ind_name];
-						k++;
+						l++;
 						ind_name++;
 						}
 						name[l]='\0';
@@ -57,7 +44,7 @@ int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char *
 						printf("[*] Name of the section : %s\n", name);
 						
 						
-						switch(header.e_type){
+						switch(header->e_type){
 							case 1: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
 							case 2: case 3: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
 							default: printf("[*] Value: %x\n", Symtab[compt].st_value );break; 
@@ -90,16 +77,40 @@ int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char *
 						
 						printf("[*] Other : %d\n", Symtab[compt].st_other);
 						
-						printf("[*] Section index : %d\n", Symtab[compt].st_shndx);
+						printf("[*] Section index : %d\n\n", Symtab[compt].st_shndx);
 					
-					}
-					compt++;
-				}	
+			}
+				k=k+16;
 			}
 		}
-	}else{ printf("[E] Echec malloc dans la table des symboles \n");return 0;}
+	}		
+	fclose(f);
 	
-	if(isVerbose){ printf("[*] Nombre symboles : %d\n",compt);}
+	for (j=0; j<compt; j++){
+
+
+		if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
+
+			Symtab[j].st_name =reverse_4(Symtab[j].st_name);
+			Symtab[j].st_value =reverse_4(Symtab[j].st_value);
+			Symtab[j].st_size =reverse_4(Symtab[j].st_size);
+			Symtab[j].st_info =reverse_4(Symtab[j].st_info );
+			Symtab[j].st_other =reverse_4(Symtab[j].st_other);
+			Symtab[j].st_shndx =reverse_4(Symtab[j].st_shndx);
+			
+		}
+		
+
 	
+	}
+
+
+} else {
+	printf("Probleme ouverture fichier(table section)\n");
+	return 0;
+}
+
+
 	return 1;
 }
+
