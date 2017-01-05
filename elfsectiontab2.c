@@ -68,25 +68,29 @@ for(i=0;i<header->e_shnum;i++){
 }
 
 char * nom_type(int i){
-switch (Shtab[j].sh_type) {
-			case 0:  return "SHT_NULL"; break;
-			case 1: return "SHT_PROGBITS"; break;
-			case 2: return "SHT_SYMTAB"; break;
-			case 3: return "SHT_STRTAB"; break;
-			case 4: return "SHT_RELA"; break;
-			case 5: return "SHT_HASH"; break;
-			case 6: return "SHT_DYNAMIC"; break;
-			case 7: return "SHT_NOTE"; break;
-			case 8: return "SHT_NOBITS"; break;
-			case 9: return "SHT_REL"; break;
-			case 10: return "SHT_SHLIB"; break;
-			case 11: return "SHT_DYNSYM"; break;
-			case 0x70000000: return "SHT_LOPROC"; break;
-			case 0x7fffffff: return "SHT_HIPROC"; break;
-			case 0x80000000: return "SHT_LOUSER"; break;
-			case 0xffffffff: return "SHT_HIUSER"; break;
+	char nom;
+	nom = malloc(sizeof(char)*30);
+
+	switch (Shtab[j].sh_type) {
+			case 0:  strcpy(nom, "SHT_NULL"); break;
+			case 1: strcpy(nom, "SHT_PROGBITS"); break;
+			case 2: strcpy(nom, "SHT_SYMTAB"); break;
+			case 3: strcpy(nom, "SHT_STRTAB"); break;
+			case 4: strcpy(nom, "SHT_RELA"); break;
+			case 5: strcpy(nom, "SHT_HASH"); break;
+			case 6: strcpy(nom, "SHT_DYNAMIC"); break;
+			case 7: strcpy(nom, "SHT_NOTE"); break;
+			case 8: strcpy(nom, "SHT_NOBITS"); break;
+			case 9: strcpy(nom, "SHT_REL"); break;
+			case 10: strcpy(nom, "SHT_SHLIB"); break;
+			case 11: strcpy(nom, "SHT_DYNSYM"); break;
+			case 0x70000000: strcpy(nom, "SHT_LOPROC"); break;
+			case 0x7fffffff: strcpy(nom, "SHT_HIPROC"); break;
+			case 0x80000000: strcpy(nom, "SHT_LOUSER"); break;
+			case 0xffffffff: strcpy(nom, "SHT_HIUSER"); break;
 
 		}
+	return nom;
 }
 
 
@@ -172,13 +176,19 @@ for (j=0; j<header.e_shnum; j++){
 			case 0xffffffff:printf("[*] Type : SHT_HIUSER\n"); break;
 		}
 
+		char nom;
+		nom = malloc(sizeof(char)*30);
+
+
 		switch (Shtab[j].sh_flags) {
-			case 0: return "SHF_NULL"; break;
-			case 0x1:return "SHF_WRITE"; break;
-			case 0x2:return "SHF_ALLOC"; break;
-			case 0x4:return "SHF_EXECINSTR"; break;
-			case 0xf0000000:return "SHF_MASKPROC"; break;
+			case 0: strcpy(nom, "SHF_NULL"); break;
+			case 0x1:strcpy(nom, "SHF_WRITE"); break;
+			case 0x2:strcpy(nom, "SHF_ALLOC"); break;
+			case 0x4:strcpy(nom, "SHF_EXECINSTR"); break;
+			case 0xf0000000:strcpy(nom, "SHF_MASKPROC"); break;
 		}
+
+		return nom;
 		
 		printf("[*] Adrress : %x\n", Shtab[j].sh_addr);
 
