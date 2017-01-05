@@ -1,0 +1,8 @@
+Jour 1 
+	- Lecture de la documentation
+	- Ecriture d'une fonction pour lire les bytes dans le fichier .o
+	- Debut du remplissage de la structure header (a la main)
+Jour 2
+	- On a tout refais pour que ce soit plus simple
+	- on a remplis la structure avec un fread() au lieu de le rentrer a la main
+	- Recuperation du nom des sections
