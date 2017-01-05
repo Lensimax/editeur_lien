@@ -69,29 +69,30 @@ for(i=0;i<header->e_shnum;i++){
 
 char * nom_type(int i){
 switch (Shtab[j].sh_type) {
-			case 0: printf("[E] Type : SHT_NULL\n"); break;
-			case 1:printf("[*] Type : SHT_PROGBITS\n"); break;
-			case 2:printf("[*] Type : SHT_SYMTAB\n"); break;
-			case 3:printf("[*] Type : SHT_STRTAB\n"); break;
-			case 4:printf("[*] Type : SHT_RELA\n"); break;
-			case 5:printf("[*] Type : SHT_HASH\n"); break;
-			case 6:printf("[*] Type : SHT_DYNAMIC\n"); break;
-			case 7:printf("[*] Type : SHT_NOTE\n"); break;
-			case 8:printf("[*] Type : SHT_NOBITS\n"); break;
-			case 9:printf("[*] Type : SHT_REL\n"); break;
-			case 10:printf("[*] Type : SHT_SHLIB\n"); break;
-			case 11:printf("[*] Type : SHT_DYNSYM\n"); break;
-			case 0x70000000:printf("[*] Type : SHT_LOPROC\n"); break;
-			case 0x7fffffff:printf("[*] Type : SHT_HIPROC\n"); break;
-			case 0x80000000:printf("[*] Type : SHT_LOUSER\n"); break;
-			case 0xffffffff:printf("[*] Type : SHT_HIUSER\n"); break;
+			case 0:  return "SHT_NULL"; break;
+			case 1: return "SHT_PROGBITS"; break;
+			case 2: return "SHT_SYMTAB"; break;
+			case 3: return "SHT_STRTAB"; break;
+			case 4: return "SHT_RELA"; break;
+			case 5: return "SHT_HASH"; break;
+			case 6: return "SHT_DYNAMIC"; break;
+			case 7: return "SHT_NOTE"; break;
+			case 8: return "SHT_NOBITS"; break;
+			case 9: return "SHT_REL"; break;
+			case 10: return "SHT_SHLIB"; break;
+			case 11: return "SHT_DYNSYM"; break;
+			case 0x70000000: return "SHT_LOPROC"; break;
+			case 0x7fffffff: return "SHT_HIPROC"; break;
+			case 0x80000000: return "SHT_LOUSER"; break;
+			case 0xffffffff: return "SHT_HIUSER"; break;
+
 		}
 }
 
 
 
 
-/*for (j=0; j<header.e_shnum; j++){
+for (j=0; j<header.e_shnum; j++){
 	
 
 
@@ -172,11 +173,11 @@ for (j=0; j<header.e_shnum; j++){
 		}
 
 		switch (Shtab[j].sh_flags) {
-			case 0: printf("[E] Flag : SHF_NULL\n"); break;
-			case 0x1:printf("[*] Flag : SHF_WRITE\n"); break;
-			case 0x2:printf("[*] Flag : SHF_ALLOC\n"); break;
-			case 0x4:printf("[*] Flag : SHF_EXECINSTR\n"); break;
-			case 0xf0000000:printf("[*] Flag : SHF_MASKPROC\n"); break;
+			case 0: return "SHF_NULL"; break;
+			case 0x1:return "SHF_WRITE"; break;
+			case 0x2:return "SHF_ALLOC"; break;
+			case 0x4:return "SHF_EXECINSTR"; break;
+			case 0xf0000000:return "SHF_MASKPROC"; break;
 		}
 		
 		printf("[*] Adrress : %x\n", Shtab[j].sh_addr);
@@ -206,7 +207,7 @@ for (j=0; j<header.e_shnum; j++){
 
 
 
-}*/
+}
 
 
 
