@@ -27,6 +27,7 @@ Lecteur de fichier ;
 
 5.Affichage des tables de réimplantation et des détails relatifs à chaque entrée ;
 
-
+	elfreloc.c  // Bon fonctionnement a verifier, affichage r_offset pas sûr du tout
+	elfreloc.h
 
 ////////////////////////////////////////////////////////////////////

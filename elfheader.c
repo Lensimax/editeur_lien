@@ -1,9 +1,9 @@
 #include "elfheader.h"
 
- 
 ///// REMPLISSAGE DE LA STRUCTURE
 
 int readHeader(char *filePath, Elf32_Ehdr *header){
+
 	FILE *f;
 
 	f = fopen(filePath, "r");
@@ -12,15 +12,33 @@ int readHeader(char *filePath, Elf32_Ehdr *header){
 		fread(header, sizeof(Elf32_Ehdr), 1, f);
 		fclose(f);
 	} else {
-		printf("Probleme ouverture fichier\n");
+		printf("Probleme ouverture fichier (header)\n");
 		return 0;
 	}
 
 	if(header->e_ident[EI_MAG0] == 127 && header->e_ident[EI_MAG1] == 69 && header->e_ident[EI_MAG2] == 76 && header->e_ident[EI_MAG3] == 70){
+	
+		if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
+		header->e_type = reverse_2(header->e_type);
+		header->e_machine = reverse_2(header->e_machine);
+		header->e_version = reverse_4(header->e_version);
+		header->e_entry = reverse_4(header->e_entry);
+		header->e_phoff = reverse_4(header->e_phoff);
+		header->e_shoff = reverse_4(header->e_shoff);
+		header->e_flags = reverse_4(header->e_flags);
+		header->e_ehsize = reverse_2(header->e_ehsize);
+		header->e_phentsize = reverse_2(header->e_phentsize);
+		header->e_phnum = reverse_2(header->e_phnum);
+		header->e_shentsize = reverse_2(header->e_shentsize);
+		header->e_shnum = reverse_2(header->e_shnum);
+		header->e_shstrndx = reverse_2(header->e_shstrndx);
+		}
 		return 1;
 	} else {
 		return 0;
 	}
+
+	
 
 }
 
@@ -142,10 +160,4 @@ void aff_header(Elf32_Ehdr *header){
 
 
 }
-	
-
-
-
-
-
 

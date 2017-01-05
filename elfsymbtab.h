@@ -5,6 +5,4 @@
 #include "filereader.h"
 #include "elfsectiontab.h"
 
-Elf32_Sym * readSymbtab(Elf32_Ehdr header, Elf32_Shdr * tab,char * filePath, int isVerbose);
-
-int printSymbtab( Elf32_Sym * Symtab);
+int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char * filePath, int isVerbose);

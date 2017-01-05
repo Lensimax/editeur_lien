@@ -1,122 +1,199 @@
 #include "elfsectiontab.h"
 
-Elf32_Shdr * readSectTab(Elf32_Ehdr header, char * filePath, int isVerbose){
+int readSectTab(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath){
+ 
+int j;
+FILE *f;
 
-Elf32_Addr i = /*header.e_entry*/ + header.e_shoff ;//adresse de depart(0 par defaut) + décalage 
-unsigned char* fileBytes = readFileBytes(filePath);
-Elf32_Shdr * Shtab = malloc(sizeof(Elf32_Shdr)*header.e_shnum);
-Elf32_Half j;
-int ind_name;
-char name[256];
-int k;
 
-for (j=0; j<header.e_shnum; j++){
+f = fopen(filePath, "r");
+
+if(f != NULL){
+	fseek(f, header->e_shoff, SEEK_SET);
 	
-	Shtab[j].sh_name = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];	//name index
-	i = i+4;			
+	for (j=0; j<header->e_shnum; j++){
+		fread(&shtab[j], sizeof(Elf32_Shdr), 1, f);
+	}		
+	fclose(f);
 	
-	Shtab[j].sh_type = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3]; //type
-	i = i+4;
+	if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
 
-	
-	Shtab[j].sh_flags = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
 
-	Shtab[j].sh_addr = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
+		for (j=0; j<header->e_shnum; j++){
 
-	Shtab[j].sh_offset = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
+			shtab[j].sh_name = reverse_4(shtab[j].sh_name);
+			shtab[j].sh_type = reverse_4(shtab[j].sh_type);
+			shtab[j].sh_flags = reverse_4(shtab[j].sh_flags);
+			shtab[j].sh_addr = reverse_4(shtab[j].sh_addr);
+			shtab[j].sh_offset = reverse_4(shtab[j].sh_offset);
+			shtab[j].sh_size = reverse_4(shtab[j].sh_size);
+			shtab[j].sh_link = reverse_4(shtab[j].sh_link);
+			shtab[j].sh_info = reverse_4(shtab[j].sh_info);
+			shtab[j].sh_addralign = reverse_4(shtab[j].sh_addralign);
+			shtab[j].sh_entsize = reverse_4(shtab[j].sh_entsize);
+			
+		}
 
-	Shtab[j].sh_size = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
+		
+	}
 
-	Shtab[j].sh_link = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
-	
-	Shtab[j].sh_info = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
 
-	Shtab[j].sh_addralign = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
-
-	Shtab[j].sh_entsize = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-	i = i+4;
+} else {
+	printf("Probleme ouverture fichier(table section)\n");
+	return 0;
 }
-for (j=0; j<header.e_shnum; j++){
-	if (isVerbose ) {
 
-		printf("[*] Name indice : %d\n",Shtab[j].sh_name);
+
+	return 1;
+}
+
+
+
+/////// NOM DES TYPES
+
+char * nom_type(int i){
+	char* nom;
+	nom = malloc(sizeof(char)*30);
+
+	switch (i) {
+		case SHT_NULL:		 	return "NULL";
+		case SHT_PROGBITS:		return "PROGBITS";
+		case SHT_SYMTAB:		return "SYMTAB";
+		case SHT_STRTAB:		return "STRTAB";
+		case SHT_RELA:			return "RELA";
+		case SHT_HASH:			return "HASH";
+		case SHT_DYNAMIC:		return "DYNAMIC";
+		case SHT_NOTE:			return "NOTE";
+		case SHT_NOBITS:		return "NOBITS";
+		case SHT_REL:			return "REL";
+		case SHT_SHLIB:			return "SHLIB";
+		case SHT_DYNSYM:		return "DYNSYM";
+		case SHT_INIT_ARRAY:	return "INIT_ARRAY";
+		case SHT_FINI_ARRAY:	return "FINI_ARRAY";
+		case SHT_PREINIT_ARRAY:	return "PREINIT_ARRAY";
+		case SHT_GROUP:			return "GROUP";
+		case SHT_SYMTAB_SHNDX:	return "SYMTAB SECTION INDICIES";
+		case SHT_GNU_verdef:	return "VERDEF";
+		case SHT_GNU_verneed:	return "VERNEED";
+		case SHT_GNU_versym:	return "VERSYM";
+		case 0x6ffffff0:		return "VERSYM";
+		case 0x6ffffffc:		return "VERDEF";
+		case 0x7ffffffd:		return "AUXILIARY";
+		case 0x7fffffff:		return "FILTER";
+		case 0x70000001:		return "ARM_EXITDX";
+		case 0x70000002:		return "ARM_PREEMPTMAP";
+		case 0x70000003:		return "ARM_ATTRIBUTES";
+		case 0x70000004:		return "ARM_DEBUGOVERLAY";
+		case 0x70000005:		return "ARM_OVERLAYSECTION";
+		case SHT_GNU_LIBLIST: return "GNU_LIBLIST";
 		
-		// Searching the name of the section
-		ind_name = Shtab[header.e_shstrndx].sh_offset;
-		k = 0;
-		
-		ind_name =  ind_name + Shtab[j].sh_name;
-		
-		while(fileBytes[ind_name] != '\0'){
-		name[k] = fileBytes[ind_name];
-		k++;
-		ind_name++;
+		default: return "";
 		}
-		name[k]='\0';
-		// Displaying the name
-		printf("[*] Name of the section : %s\n", name);
+	return nom;
+}
 
-		switch (Shtab[j].sh_type) {
-			case 0: printf("[E] Type : SHT_NULL\n"); break;
-			case 1:printf("[*] Type : SHT_PROGBITS\n"); break;
-			case 2:printf("[*] Type : SHT_SYMTAB\n"); break;
-			case 3:printf("[*] Type : SHT_STRTAB\n"); break;
-			case 4:printf("[*] Type : SHT_RELA\n"); break;
-			case 5:printf("[*] Type : SHT_HASH\n"); break;
-			case 6:printf("[*] Type : SHT_DYNAMIC\n"); break;
-			case 7:printf("[*] Type : SHT_NOTE\n"); break;
-			case 8:printf("[*] Type : SHT_NOBITS\n"); break;
-			case 9:printf("[*] Type : SHT_REL\n"); break;
-			case 10:printf("[*] Type : SHT_SHLIB\n"); break;
-			case 11:printf("[*] Type : SHT_DYNSYM\n"); break;
-			case 0x70000000:printf("[*] Type : SHT_LOPROC\n"); break;
-			case 0x7fffffff:printf("[*] Type : SHT_HIPROC\n"); break;
-			case 0x80000000:printf("[*] Type : SHT_LOUSER\n"); break;
-			case 0xffffffff:printf("[*] Type : SHT_HIUSER\n"); break;
-		}
+/////// NOM DES FLAGS
 
-		switch (Shtab[j].sh_flags) {
-			case 0: printf("[E] Flag : SHF_NULL\n"); break;
-			case 0x1:printf("[*] Flag : SHF_WRITE\n"); break;
-			case 0x2:printf("[*] Flag : SHF_ALLOC\n"); break;
-			case 0x4:printf("[*] Flag : SHF_EXECINSTR\n"); break;
-			case 0xf0000000:printf("[*] Flag : SHF_MASKPROC\n"); break;
-		}
-		
-		printf("[*] Adrress : %x\n", Shtab[j].sh_addr);
+char* nom_flags(unsigned int flags) {
 
-		printf("[*] Offset : %d\n", Shtab[j].sh_offset);
+	char* val = malloc(sizeof(char)*9);
 
-		printf("[*] Size : %x\n", Shtab[j].sh_size);
-
-		printf("[*] Link : %x\n", Shtab[j].sh_link);
-
-		switch (Shtab[j].sh_type) {
-			case 2: case 11: printf("[*] Info : index %x of the relocation\n",Shtab[j].sh_info); break;
-			case 4: case 9: printf("[*] Info : index %x of last local symbol+1\n",Shtab[j].sh_info); break;
-			default :printf("[*] Info : No Data\n"); break;
-		
-		}
-
-		printf("[*] Addralign : %x\n", Shtab[j].sh_addralign);
-
-		printf("[*] Entsize : %x\n", Shtab[j].sh_entsize);
-		
-
+	int p;
+	for(p=0;p<9;p++) {
+			val[p]='\0';
+	}
+	int r;
+	int i = 1;
+	int b = 0;
+	while (flags != 0)
+	{
+		r = flags%2;
+        flags = flags/2;
+        b = b+r*i;
+        i = i*10;
 	}
 
 
 
+	if (b & 00000001)
+	{
+		val[0]='W';
+		if (b & 00000010)
+		{
+		val[1]='A';
+			if (b & 00000100)
+			{
+			val[2]='X';
+			}
+		}
+		else if (b & 00000100)
+			{
+			val[1]='X';
+			}
+	}
 
+	else if (b & 00000010)
+	{
+		val[0]='A';
+		if (b & 00000100)
+		{
+		val[1]='X';
+		}
+	}
+
+	else if (b & 00000100) {
+		val[0]='X';
+		}
+
+	if(b!=0 && val[0]=='\0') {
+	val = "U";
+
+	}
+
+	return val;
 
 
 }
-	return Shtab;
+
+
+///////AFFICHAGE
+
+void aff_Sheader(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath){
+
+int i, k;
+char * name;
+int ind_name;
+unsigned char* fileBytes = readFileBytes(filePath);
+name = malloc(sizeof(char)*50);
+
+printf("\nLecture des headers de sections : \n\n");
+
+printf("  [Nr]  Nom\t\t        Type\t         Adr    \tDecala.\tTaille\tES\tFan\tLN\tInf\tAl\n");
+
+for(i=0;i<header->e_shnum;i++){
+
+// Searching the name of the section
+		ind_name = shtab[header->e_shstrndx].sh_offset;
+		k = 0;
+		
+		ind_name =  ind_name + shtab[i].sh_name;
+		
+		while(fileBytes[ind_name] != '\0'){
+			name[k] = fileBytes[ind_name];
+			k++;
+			ind_name++;
+		}
+		name[k]='\0';
+
+
+	printf("  [%2d] %-25s%-17s%08d\t%06x\t%06x\t%02x\t%-1.04s\t%d\t%d\t%d\n",i,name,nom_type(shtab[i].sh_type),shtab[i].sh_addr,shtab[i].sh_offset,shtab[i].sh_size,shtab[i].sh_entsize,nom_flags(shtab[i].sh_flags),shtab[i].sh_link,shtab[i].sh_info,shtab[i].sh_addralign);
+
 }
+
+printf (("\nClé des fanions:\t W (écriture), A (allocation), X (exécution), U (Valeur Inconnue)\n\n"));
+free(name);
+
+}
+
+
+
