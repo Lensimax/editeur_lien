@@ -1,8 +1,10 @@
 #include "elfreloc.h"
 
-Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, int isVerbose) {
+Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath, int isVerbose) {
 
 	unsigned char* fileBytes = readFileBytes(filePath);
+	int ind_name;
+	char name[256];
 	Elf32_Reloc Reloc;
 	Elf32_Rel * Reltab = malloc(sizeof(Elf32_Rel));
 	Els32_Rela * Relatab = malloc(sizeof(Elf32_Rela));
@@ -28,41 +30,20 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 					k=k+8;
 					
 					if(isVerbose){
-						printf("[*] Offset : %x\n",Reltab[compt].st_offset); // Surement faux 
-						/*printf("[*] Info : %x\n",Reltab[compt].st_offset);
-						switch(ELF32_ST_TYPE(Symtab[compt].st_info)){
-							case 2: case 1: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
-							default: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
+						printf("[*] Offset : %x\n",Reltab[compt].st_offset); // Sûrement faux
+						
+						// Searching the name of the section
+						ind_name = Shtab[header.e_shstrndx].sh_offset;
+						int l = 0;
+						ind_name =  ind_name + Reltab[compt].r_info;
+						while(fileBytes[ind_name] != '\0'){
+						name[l] = fileBytes[ind_name];
+						k++;
+						ind_name++;
 						}
-						
-						
-						printf("[*] Size : %x\n", Symtab[compt].st_size);
-						
-						printf("[*] Info code : %x\n", Symtab[compt].st_info);
-						
-						switch (ELF32_ST_BIND(Symtab[compt].st_info)) {
-							case 0: printf("[*] Info bind : STB_LOCAL \n"); break;
-							case 1:printf("[*] Info bind : STB_GLOBAL\n"); break;
-							case 2:printf("[*] Info bind : STB_WEAK\n"); break;
-							case 13:printf("[*] Info bind : STB_LOPROC\n"); break;
-							case 15:printf("[*] Info bind : STB_HIPROC\n"); break;
-							default:printf("[*] Info bind :unknown \n"); break;
-						}
-							
-						switch (ELF32_ST_TYPE(Symtab[compt].st_info)) {
-							case 0: printf("[*] Info type : STT_NOTYPE \n"); break;
-							case 1:printf("[*] Info type : STT_OBJECT \n"); break;
-							case 2:printf("[*] Info type : STT_FUNC \n"); break;
-							case 3:printf("[*] Info type : STT_SECTION \n"); break;
-							case 4:printf("[*] Info type : STT_FILE \n"); break;
-							case 13:printf("[*] Info type : STT_LOPROC \n"); break;
-							case 15:printf("[*] Info type : STT_HIPROC \n"); break;
-							default:printf("[*] Info type :unknown \n"); break;
-						}
-						
-						printf("[*] Other : %d\n", Symtab[compt].st_other);
-						
-						printf("[*] Section index : %d\n", Symtab[compt].st_shndx);*/
+						name[l]='\0';
+						// Displaying the name
+						printf("[*] Name of the section : %s\n", name);
 					
 					} 
 					compt++; 
@@ -93,15 +74,14 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 					i=i+4;
 					k=k+12;
 					
-					/*if(isVerbose){
-						printf("[*] Name indice : %d\n",Symtab[compt].st_name);
-		
+					if(isVerbose){
+					
+						printf("[*] Offset : %x\n",Relatab[compt].st_offset); // Sûrement faux
+						
 						// Searching the name of the section
 						ind_name = Shtab[header.e_shstrndx].sh_offset;
 						int l = 0;
-		
-						ind_name =  ind_name + Symtab[compt].st_name;
-		
+						ind_name =  ind_name + Relatab[compt].r_info;
 						while(fileBytes[ind_name] != '\0'){
 						name[l] = fileBytes[ind_name];
 						k++;
@@ -111,42 +91,9 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 						// Displaying the name
 						printf("[*] Name of the section : %s\n", name);
 						
-						
-						switch(ELF32_ST_TYPE(Symtab[compt].st_info)){
-							case 2: case 1: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
-							default: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
-						}
-						
-						
-						printf("[*] Size : %x\n", Symtab[compt].st_size);
-						
-						printf("[*] Info code : %x\n", Symtab[compt].st_info);
-						
-						switch (ELF32_ST_BIND(Symtab[compt].st_info)) {
-							case 0: printf("[*] Info bind : STB_LOCAL \n"); break;
-							case 1:printf("[*] Info bind : STB_GLOBAL\n"); break; 						A COMPLETER
-							case 2:printf("[*] Info bind : STB_WEAK\n"); break;
-							case 13:printf("[*] Info bind : STB_LOPROC\n"); break;
-							case 15:printf("[*] Info bind : STB_HIPROC\n"); break;
-							default:printf("[*] Info bind :unknown \n"); break;
-						}
-							
-						switch (ELF32_ST_TYPE(Symtab[compt].st_info)) {
-							case 0: printf("[*] Info type : STT_NOTYPE \n"); break;
-							case 1:printf("[*] Info type : STT_OBJECT \n"); break;
-							case 2:printf("[*] Info type : STT_FUNC \n"); break;
-							case 3:printf("[*] Info type : STT_SECTION \n"); break;
-							case 4:printf("[*] Info type : STT_FILE \n"); break;
-							case 13:printf("[*] Info type : STT_LOPROC \n"); break;
-							case 15:printf("[*] Info type : STT_HIPROC \n"); break;
-							default:printf("[*] Info type :unknown \n"); break;
-						}
-						
-						printf("[*] Other : %d\n", Symtab[compt].st_other);
-						
-						printf("[*] Section index : %d\n", Symtab[compt].st_shndx);
+						printf("[*] Addend : %ld\n", Relatab[compt].r_append);
 					
-					} */
+					} 
 					compt++; 
 				}	
 			}
