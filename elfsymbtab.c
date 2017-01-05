@@ -1,7 +1,7 @@
 #include "elfsymbtab.h"
 
 
-Elf32_Sym * readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,char * filePath, int isVerbose){
+int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char * filePath, int isVerbose){
 
 
 	
@@ -9,8 +9,6 @@ Elf32_Sym * readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,char * filePath, i
 	unsigned char* fileBytes = readFileBytes(filePath);
 	int ind_name;
 	char name[256];
-	
-	Elf32_Sym * Symtab = (Elf32_Sym * ) malloc(sizeof(Elf32_Sym));
 	int compt = 0;
 	if (Symtab != NULL){	//Si l'allocation reussi
 	
@@ -24,7 +22,7 @@ Elf32_Sym * readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,char * filePath, i
 				while (k < header.e_shentsize){	// while not end of section
 					if (compt != 0){		//
 					Symtab = (Elf32_Sym * ) realloc(Symtab, sizeof(Symtab)+sizeof(Elf32_Sym));
-						if (Symtab == NULL){printf("[E] Echec realloc dans la table des symboles \n");return NULL;}
+						if (Symtab == NULL){printf("[E] Echec realloc dans la table des symboles \n");return 0;}
 					}
 					Symtab[compt].st_name = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
 					i=i+4;
@@ -59,9 +57,10 @@ Elf32_Sym * readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,char * filePath, i
 						printf("[*] Name of the section : %s\n", name);
 						
 						
-						switch(ELF32_ST_TYPE(Symtab[compt].st_info)){
-							case 2: case 1: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
-							default: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
+						switch(header.e_type){
+							case 1: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
+							case 2: case 3: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
+							default: printf("[*] Value: %x\n", Symtab[compt].st_value );break; 
 						}
 						
 						
@@ -98,9 +97,9 @@ Elf32_Sym * readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,char * filePath, i
 				}	
 			}
 		}
-	}else{ printf("[E] Echec malloc dans la table des symboles \n");return NULL;}
+	}else{ printf("[E] Echec malloc dans la table des symboles \n");return 0;}
 	
 	if(isVerbose){ printf("[*] Nombre symboles : %d\n",compt);}
 	
-	return Symtab;
+	return 1;
 }
