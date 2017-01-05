@@ -49,34 +49,6 @@ int readHeader(char *filePath, Elf32_Ehdr *header){
 
 void aff_header(Elf32_Ehdr *header){
 
-
-	// unsigned int first;
- //    unsigned int second;
-	// unsigned int sum;
-
-
-	if(header->e_ident[EI_MAG0] == 127 && header->e_ident[EI_MAG1] == 69 && header->e_ident[EI_MAG2] == 76 && header->e_ident[EI_MAG3] == 70){
-        printf("[*] Fichier ELF Reconnu\n");
-	} else{
-        printf("[E] Le fichier fourni n'est pas un fichier ELF\n");
-	}
-	
-		
-	if(header->e_ident[EI_CLASS] == 1){
-		printf("[*] Classe : 32 Bits ELFCLASS32\n");
-	} else {
-		printf("[E] Classe : Invalide\n");
-	}
-	
-	
-	if(header->e_ident[EI_DATA] == 1){
-			printf("[*] EI_DATA : LSB Little endian\n");
-	} else if(header->e_ident[EI_DATA] == 2){
-		printf("[*] EI_DATA : MSB Big endian\n");
-	} else {
-		printf("[E] Erreur de lecture de l'encodage EI_DATA\n");
-	}
-
 	if(header->e_ident[EI_MAG0] == 127 && header->e_ident[EI_MAG1] == 69 && header->e_ident[EI_MAG2] == 76 && header->e_ident[EI_MAG3] == 70){
 		printf("[*] Fichier ELF Reconnu\n");
 	}else{	printf("[E] Le fichier fourni n'est pas un fichier ELF\n");
