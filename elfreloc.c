@@ -1,6 +1,6 @@
 #include "elfreloc.h"
 
-Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath, int isVerbose) {
+int readReloc(Elf32_Rel * Reltab, Elf32_Ehdr header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath, int isVerbose) {
 
 	unsigned char* fileBytes = readFileBytes(filePath);
 	int ind_name;
@@ -9,99 +9,52 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, Elf32_Sym * Symta
 	Elf32_Rel * Reltab = malloc(sizeof(Elf32_Rel));
 	Els32_Rela * Relatab = malloc(sizeof(Elf32_Rela));
 	//int compt = 0;
-	if (Reltab != NULL){	//Si l'allocation reussi
-	
-		for (int j=0; j<header.e_shnum; j++){ // for each section
+	int j;
+	FILE *f;
+
+
+	f = fopen(filePath, "r");
+
+	if(f != NULL){
+		fseek(f, header->e_shoff, SEEK_SET);
 		
-			if (( Shtab[j].sh_type == 9 )){	//if Rel tab
-			
-				int i = Shtab[j].sh_offset;		 // debut de la table de symboles
-				int k = 0; 
+		for (j=0; j<header->e_shentsize; j++){
+			fread(&Reltab[j], sizeof(Elf32_Shdr), 1, f);
+		}		
+		fclose(f);
+		
+		if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
+	
+	
+			for (j=0; j<header->e_shnum; j++){
+	
+				shtab[j].sh_name = reverse_4(Reltab[j].r_offset);
+				shtab[j].sh_type = reverse_4(Reltab[j].r_info);
 				
-				while (k < header.e_shentsize){	// while not end of section
-					if (compt != 0){		//
-						Reltab = (Elf32_Rel * ) realloc(Reltab, sizeof(Reltab)+sizeof(Elf32_Rel));
-						if (Reltab == NULL){printf("[E] Echec realloc dans la table des realocations \n");return NULL;}
-					}
-					Reltab[compt].r_offset = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					Reltab[compt].r_info = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					k=k+8;
-					
-					if(isVerbose){
-						printf("[*] Offset : %x\n",Reltab[compt].r_offset); // Sûrement faux
-						
-						// Searching the name of the section
-						ind_name = Shtab[header.e_shstrndx].sh_offset;
-						int l = 0;
-						ind_name =  ind_name + Reltab[compt].r_info;
-						while(fileBytes[ind_name] != '\0'){
-						name[l] = fileBytes[ind_name];
-						k++;
-						ind_name++;
-						}
-						name[l]='\0';
-						// Displaying the name
-						printf("[*] Name of the section : %s\n", name);
-					
-					} 
-					compt++; 
-				}	
 			}
 		}
-	}else{ printf("[E] Echec malloc dans la table des symboles \n");return NULL;}
+	} else {
+		printf("Probleme ouverture fichier(table section)\n");
+		return 0;
+	}
+	for (j = 0; j<header->e_shentsize; j++) {				
+		if(isVerbose){
+			printf("[*] Offset : %x\n",Reltab[compt].r_offset); // Sûrement faux
 	
-	if (Relatab != NULL){	//Si l'allocation reussi
-	
-		for (int j=0; j<header.e_shnum; j++){ // for each section
-		
-			if (( Shtab[j].sh_type == 4 )){	//if Rela tab
-			
-				int i = Shtab[j].sh_offset;		 // debut de la table de symboles
-				int k = 0; 
-				
-				while (k < header.e_shentsize){	// while not end of section
-					if (compt != 0){		//
-						Relatab = (Elf32_Rela * ) realloc(Relatab, sizeof(Relatab)+sizeof(Elf32_Rela));
-						if (Reltab == NULL){printf("[E] Echec realloc dans la table des realocations \n");return NULL;}
-					}
-					Relatab[compt].r_offset = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					Relatab[compt].r_info = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					Relatab[compt].r_addend = (fileBytes[i]<<24) + (fileBytes[i+1]<<16) + (fileBytes[i+2]<<8) + fileBytes[i+3];
-					i=i+4;
-					k=k+12;
-					
-					if(isVerbose){
-					
-						printf("[*] Offset : %x\n",Relatab[compt].st_offset); // Sûrement faux
-						
-						// Searching the name of the section
-						ind_name = Shtab[header.e_shstrndx].sh_offset;
-						int l = 0;
-						ind_name =  ind_name + Relatab[compt].r_info;
-						while(fileBytes[ind_name] != '\0'){
-						name[l] = fileBytes[ind_name];
-						k++;
-						ind_name++;
-						}
-						name[l]='\0';
-						// Displaying the name
-						printf("[*] Name of the section : %s\n", name);
-						
-						printf("[*] Addend : %ld\n", Relatab[compt].r_append);
-					
-					} 
-					compt++; 
-				}	
+			// Searching the name of the section
+			ind_name = Shtab[header.e_shstrndx].r_offset;
+			int l = 0;
+			ind_name =  ind_name + Reltab[compt].r_info;
+			while(fileBytes[ind_name] != '\0'){
+				name[l] = fileBytes[ind_name];
+				k++;
+				ind_name++;
 			}
-		}
+			name[l]='\0';
+			// Displaying the name
+			printf("[*] Name of the section : %s\n", name);
+			//printf("[*] Addend : %ld\n", Relatab[compt].r_append);
+	} 
+	}
 	}else{ printf("[E] Echec malloc dans la table des symboles \n");return NULL;}
-	
-	if(isVerbose){ printf("[*] Nombre symboles : %d\n",compt);}
-	Reloc.Reltab = Reltab;
-	Reloc.Relatab = Relatab;
-	return Reloc;
 }
