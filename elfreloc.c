@@ -27,25 +27,9 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 					i=i+4;
 					k=k+8;
 					
-					/*if(isVerbose){
-						printf("[*] Name indice : %d\n",Symtab[compt].st_name);
-		
-						// Searching the name of the section
-						ind_name = Shtab[header.e_shstrndx].sh_offset;
-						int l = 0;
-		
-						ind_name =  ind_name + Symtab[compt].st_name;
-		
-						while(fileBytes[ind_name] != '\0'){
-						name[l] = fileBytes[ind_name];
-						k++;
-						ind_name++;
-						}
-						name[l]='\0';
-						// Displaying the name
-						printf("[*] Name of the section : %s\n", name);
-						
-						
+					if(isVerbose){
+						printf("[*] Offset : %x\n",Reltab[compt].st_offset);
+						printf("[*] Info : %x\n",Reltab[compt].st_offset);
 						switch(ELF32_ST_TYPE(Symtab[compt].st_info)){
 							case 2: case 1: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
 							default: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
@@ -58,7 +42,7 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 						
 						switch (ELF32_ST_BIND(Symtab[compt].st_info)) {
 							case 0: printf("[*] Info bind : STB_LOCAL \n"); break;
-							case 1:printf("[*] Info bind : STB_GLOBAL\n"); break; 						A COMPLETER
+							case 1:printf("[*] Info bind : STB_GLOBAL\n"); break;
 							case 2:printf("[*] Info bind : STB_WEAK\n"); break;
 							case 13:printf("[*] Info bind : STB_LOPROC\n"); break;
 							case 15:printf("[*] Info bind : STB_HIPROC\n"); break;
@@ -80,7 +64,7 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 						
 						printf("[*] Section index : %d\n", Symtab[compt].st_shndx);
 					
-					} */
+					} 
 					compt++; 
 				}	
 			}
