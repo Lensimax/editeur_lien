@@ -28,8 +28,8 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 					k=k+8;
 					
 					if(isVerbose){
-						printf("[*] Offset : %x\n",Reltab[compt].st_offset);
-						printf("[*] Info : %x\n",Reltab[compt].st_offset);
+						printf("[*] Offset : %x\n",Reltab[compt].st_offset); // Surement faux 
+						/*printf("[*] Info : %x\n",Reltab[compt].st_offset);
 						switch(ELF32_ST_TYPE(Symtab[compt].st_info)){
 							case 2: case 1: printf("[*] Value: Adress : %x\n", Symtab[compt].st_value );break; 
 							default: printf("[*] Value: Alignment/Offset : %d\n", Symtab[compt].st_value );break;
@@ -62,7 +62,7 @@ Elf32_Reloc * readReloc(Elf32_Ehdr header, Elf32_Shdr * Shtab, char * filePath, 
 						
 						printf("[*] Other : %d\n", Symtab[compt].st_other);
 						
-						printf("[*] Section index : %d\n", Symtab[compt].st_shndx);
+						printf("[*] Section index : %d\n", Symtab[compt].st_shndx);*/
 					
 					} 
 					compt++; 
