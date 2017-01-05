@@ -6,3 +6,6 @@ Jour 2
 	- On a tout refait pour que ce soit plus simple
 	- On a remplit la structure avec un fread() au lieu de le rentrer a la main
 	- Recuperation du nom des sections
+Jour 3
+	- elfsection fait mais il faut améliorer l'affichage
+	- sectio tab fini 
