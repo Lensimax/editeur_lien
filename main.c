@@ -8,6 +8,8 @@
 #include "elfsectiontab.h"
 #include "elfsection.h"
 #include "util.h"
+#include "elfsymbtab.h"
+
 
 int isnumber(const char*s) {
    char* e = NULL;
@@ -19,39 +21,58 @@ int main(int argc, char * argv[]){
 
 	Elf32_Ehdr *header;
 	Elf32_Shdr *shtab;
+	Elf32_Sym *symtab;
 	header = malloc(sizeof(Elf32_Ehdr));
-
+	int erreur = 0;
+	int indice_symtab;
 	char * file_used = "ARM.o";
-	char section[50];
+	//char section[50];
 
 	if(readHeader(file_used, header)){
 		
-		//aff_header(header);
+		//aff_header(header);				/////////AFFICHAGE HEADER///////////
 		
 		shtab = malloc(sizeof(Elf32_Shdr)*header->e_shnum);
 
 		if(readSectTab(shtab, header, file_used)){
 
-			aff_Sheader(shtab, header, file_used);
+			//aff_Sheader(shtab, header, file_used);			/////////AFFICHAGE HEADER SECTIONS///////////
 
-			printf("Choisir un nom ou un numero de section pour affichage complet :\n");
+			/*printf("Choisir un nom ou un numero de section pour affichage complet :\n");
 			scanf("%s", section);
 			printf("\n");
+			
 			if(isnumber(section)){
 				 
-				read_section(file_used, *header, shtab, "", atoi(section)+1);
+				read_section(file_used, *header, shtab, "", atoi(section)+1);		/////////AFFICHAGE UNE SECTION///////////
 			}
 			else{
-				read_section(file_used, *header, shtab, section, 1);
+				read_section(file_used, *header, shtab, section, 1);				/////////AFFICHAGE UNE SECTION///////////
 			}
-		
+			*/
+			indice_symtab = getIndSectionSymtab(*header,shtab);
+			
+			symtab = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtab].sh_size/shtab[indice_symtab].sh_entsize));
+
+			if(readSymbtab(*header, shtab, symtab, file_used, indice_symtab)){
+				
+				aff_Symtable(shtab, *header, file_used, symtab, indice_symtab);
+
+			} else {
+				erreur = 1;
+			} 
 
 		} else {
-			return 1;
+			erreur = 1;
 		}
 	
 	} else {
+		erreur = 1;
+	}
+
+	if (!erreur){
 		return 1;
 	}
+
 	return 0;
 }
