@@ -13,17 +13,18 @@ char name[256];
 int compt = 0;
 
 if(f != NULL){
-	fseek(f, header->e_shoff, SEEK_SET);
 	for (j=0; j<header->e_shnum; j++){
 		
 		if (( Shtab[j].sh_type == 2 ) || ( Shtab[j].sh_type == 6 )){
-			
+			fseek(f, Shtab[j].sh_offset, SEEK_SET);
 			int k =0;
 			while (k < header->e_shentsize){			
 				if (compt != 0){		//
 						Symtab = (Elf32_Sym * ) realloc(Symtab, sizeof(Symtab)+sizeof(Elf32_Sym));
 						if (Symtab == NULL){printf("[E] Echec realloc dans la table des symboles \n");return 0;}
 						}
+				
+				
 				fread(&Symtab[compt], sizeof(Elf32_Sym), 1, f);
 				if(isVerbose){
 						printf("[*] Name indice : %d\n",Symtab[compt].st_name);
