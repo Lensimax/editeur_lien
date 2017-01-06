@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g
 
-main: main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o
+main: main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o
 	$(CC) -o $@ $^
 
 %.o: %.c                          
@@ -13,5 +13,6 @@ elfheader.o: elfheader.h filereader.h
 elfsectiontab.o : elfsectiontab.h filereader.h
 elfsection.o : elfsection.h filereader.h
 util.o : util.h
+elfsymbtab.o : elfsymbtab.h elfsectiontab.h filereader.h
 clean:
 	rm elfsectiontab.o elfheader.o filereader.o main.o
