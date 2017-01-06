@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Werror -g
+CFLAGS=-Wall -Werror -g -std=c99
 
 main: main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o
 	$(CC) -o $@ $^
@@ -16,4 +16,4 @@ util.o : util.h
 elfsymbtab.o: elfsymbtab.h elfsectiontab.h filereader.h
 elfreloc.o: elfreloc.h elfsectiontab.h filereader.h util.h
 clean:
-	rm elfsectiontab.o elfheader.o filereader.o main.o
+	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o

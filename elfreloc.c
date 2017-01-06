@@ -15,109 +15,153 @@ const char* Reloc_Type[] =
 		"R_ARM_THM_MOVT_PREL", "", "", "", "", "" 
 	};
 	
-int getIndSectionReltab(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
-	int i;
-	for(i=0;i<header->e_shnum;i++){
-		if (shtab[i].sh_type == 9) {
-			return i;
-		}
-	}
-	return 0;
+int IsIndSectionReltab(Elf32_Ehdr * header,Elf32_Shdr* shtab, int i) {
+	return shtab[i].sh_type == SHT_REL;
 }
 
-int getIndSectionRelatab(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
-	int i;
-	for(i=0;i<header->e_shnum;i++){
-		if (shtab[i].sh_type == 4) {
-			return i;
-		}
-	}
-	return 0;
+int IsIndSectionRelatab(Elf32_Ehdr * header,Elf32_Shdr* shtab, int i) {
+	return shtab[i].sh_type == SHT_RELA;
 }
 
-int readReloc(Elf32_Rel * Reltab, Elf32_Rela * Relatab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath, int Indice_Reltab, int Indice_Relatab, int isVerbose) {
+int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
+	int sum = 0;
+	for(int i=0;i<header->e_shnum;i++){
+		if (Shtab[i].sh_type == SHT_REL) {
+			sum++;
+		}
+	}
+	return sum;
+}
+
+int nbIndSectionRelatab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
+	int sum = 0;
+	for(int i=0;i<header->e_shnum;i++){
+		if (Shtab[i].sh_type == SHT_RELA) {
+			sum++;
+		}
+	}
+	return sum;
+}
+
+int readReloc(Elf32_Rel ** Reltab, Elf32_Rela ** Relatab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath, /*int Indice_Reltab, int Indice_Relatab,*/ int isVerbose) {
   
   
 	unsigned char* fileBytes = readFileBytes(filePath);
 	int ind_name;
 	char name[256];
 	//int compt = 0;
-	int j, k;
+	int j, k, n;
 	FILE *f;
   
 	// PARTIE REL
-	f = fopen(filePath, "r");
-	if(f != NULL){
-		fseek(f, Shtab[Indice_Reltab].sh_offset, SEEK_SET);
-		
-		for (j=0; j<Shtab[Indice_Reltab].sh_size/Shtab[Indice_Reltab].sh_entsize; j++){
-			fread(&Reltab[j], sizeof(Elf32_Rel), 1, f);
-		}		
-		fclose(f);
-		
-		if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
-	
-	
-			for (j=0; j<Shtab[Indice_Reltab].sh_size/Shtab[Indice_Reltab].sh_entsize; j++){
-				Reltab[j].r_offset = reverse_4(Reltab[j].r_offset);
-				Reltab[j].r_info = reverse_4(Reltab[j].r_info);				
+	n = 0;
+	for (int i=0; i<header->e_shnum; i++) {
+          if (IsIndSectionReltab(header, Shtab, i)) {
+			f = fopen(filePath, "r");
+			if(f != NULL){
+				fseek(f, Shtab[i].sh_offset, SEEK_SET);
+				Reltab[n] = malloc(sizeof(Elf32_Rel)*(Shtab[i].sh_size/Shtab[i].sh_entsize));
+				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
+					fread(&Reltab[n][j], sizeof(Elf32_Rel), 1, f);
+				}		
+				fclose(f);
+				
+				if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
+			
+			
+					for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
+						Reltab[n][j].r_offset = reverse_4(Reltab[n][j].r_offset);
+						Reltab[n][j].r_info = reverse_4(Reltab[n][j].r_info);				
+					}
+				}
+			} else {
+				printf("Probleme ouverture fichier(table section)\n");
+				return 0;
+			}			
+			if(isVerbose){
+					
+				// RECHERCHE DU NOM DE LA SECTION DE READRESSAGE	//
+				ind_name = Shtab[header->e_shstrndx].sh_offset;		//
+				k = 0;							//
+				//placement en debut de nom de section			//
+				ind_name =  ind_name + Shtab[i].sh_name;	//
+											//
+				//recuperation du nom de la section			//
+				while(fileBytes[ind_name] != '\0'){			//
+					name[k] = fileBytes[ind_name];			//
+					k++;						//
+					ind_name++;					//
+				}							//
+				//ajout de la marque de fin 				//
+				name[k]='\0';						//
+				// FIN DE LA RECHERCHE					//				
+				printf("Section de réadressage : %s\n", name);
+				
+				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){	
+					printf("[*] Offset : %x\n",Reltab[n][j].r_offset); // Sûrement faux
+					printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(Reltab[n][j].r_info)]);
+					printf("[*] Symbol Index : %x\n", ELF32_R_SYM(Reltab[n][j].r_info));
+				} 
 			}
+			n++;
 		}
-	} else {
-		printf("Probleme ouverture fichier(table section)\n");
-		return 0;
-	}
-	for (j=0; j<Shtab[Indice_Reltab].sh_size/Shtab[Indice_Reltab].sh_entsize; j++){				
-		if(isVerbose){
-			printf("[*] Offset : %x\n",Reltab[j].r_offset); // Sûrement faux
-			printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(Reltab[j].r_info)]);
-			printf("[*] Symbol Index : %x\n", ELF32_R_SYM(Reltab[j].r_info));
-		} 
 	}
   
 	// PARTIE RELA
-	if ( (int) Shtab[Indice_Relatab].sh_entsize !=  0) {
-		f = fopen(filePath, "r");
-		if(f != NULL){
-			fseek(f, Shtab[Indice_Relatab].sh_offset, SEEK_SET);
-    
-				for (j=0; j<Shtab[Indice_Relatab].sh_size/Shtab[Indice_Relatab].sh_entsize; j++){
-					fread(&Relatab[j], sizeof(Elf32_Rela), 1, f);
+	n = 0;
+	for (int i=0; i<header->e_shnum; i++) {
+          if (IsIndSectionRelatab(header, Shtab, i)) {
+			f = fopen(filePath, "r");
+			if(f != NULL){
+				fseek(f, Shtab[i].sh_offset, SEEK_SET);
+				Relatab[n] = malloc(sizeof(Elf32_Rela)*(Shtab[i].sh_size/Shtab[i].sh_entsize));
+				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
+					fread(&Relatab[n][j], sizeof(Elf32_Rela), 1, f);
 				}		
 				fclose(f);
-  
+		
 				if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
-    
-    
-				for (j=0; j<Shtab[Indice_Relatab].sh_size/Shtab[Indice_Relatab].sh_entsize; j++){
-					Relatab[j].r_offset = reverse_4(Relatab[j].r_offset);
-					Relatab[j].r_info = reverse_4(Relatab[j].r_info);
-					Relatab[j].r_addend = reverse_4(Relatab[j].r_addend);
+  		
+  		
+					for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
+						Relatab[n][j].r_offset = reverse_4(Relatab[n][j].r_offset);
+						Relatab[n][j].r_info = reverse_4(Relatab[n][j].r_info);
+						Relatab[n][j].r_addend = reverse_4(Relatab[n][j].r_addend);
+					}
 				}
+			} else {
+				printf("Probleme ouverture fichier(table section)\n");
+				return 0;
 			}
-		} else {
-			printf("Probleme ouverture fichier(table section)\n");
-			return 0;
-		}
-		for (j=0; j<Shtab[Indice_Relatab].sh_size/Shtab[Indice_Relatab].sh_entsize; j++){				
 			if(isVerbose){
-				printf("[*] Offset : %x\n",Reltab[j].r_offset); // Sûrement faux
-
-				// Searching the name of the section
-				ind_name = Shtab[header->e_shstrndx].sh_offset;
-				int l = 0;
-				ind_name =  ind_name + Reltab[j].r_info;
-				while(fileBytes[ind_name] != '\0'){
-					name[l] = fileBytes[ind_name];
-					k++;
-					ind_name++;
-				}
-				name[l]='\0';
-				// Displaying the name
-				printf("[*] Name of the section : %s\n", name);
-				printf("[*] Addend : %d\n", Relatab[j].r_addend);
-			} 
+					
+				// RECHERCHE DU NOM DE LA SECTION DE READRESSAGE	//
+				ind_name = Shtab[header->e_shstrndx].sh_offset;		//
+				k = 0;							//
+				//placement en debut de nom de section			//
+				ind_name =  ind_name + Shtab[i].sh_name;	//
+											//
+				//recuperation du nom de la section			//
+				while(fileBytes[ind_name] != '\0'){			//
+					name[k] = fileBytes[ind_name];			//
+					k++;						//
+					ind_name++;					//
+				}							//
+				//ajout de la marque de fin 				//
+				name[k]='\0';						//
+				// FIN DE LA RECHERCHE					//				
+				printf("Section de réadressage : %s\n", name);
+				
+				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){	
+					printf("[*] Offset : %x\n",Relatab[n][j].r_offset); // Sûrement faux
+					printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(Relatab[n][j].r_info)]);
+					printf("[*] Symbol Index : %x\n", ELF32_R_SYM(Relatab[n][j].r_info));
+					printf("[*] Addend : %d\n", Relatab[n][j].r_addend);
+				} 
+			}
+			n++;
 		}
 	}
+
 return 0;
 }
