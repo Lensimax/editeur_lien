@@ -1,9 +1,9 @@
 #include "elfsymbtab.h"
 
-///////RECHERCE de la section correspondant a la table des symboles SHT_SYMTAB 
-int getIndSectionSymtab(Elf32_Ehdr header,Elf32_Shdr* shtab) {
+int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
+
 	int i;
-	for(i=0;i<header.e_shnum;i++){
+	for(i=0;i<header->e_shnum;i++){
 		if (shtab[i].sh_type == 2) {
 			return i;
 		}
@@ -12,7 +12,7 @@ int getIndSectionSymtab(Elf32_Ehdr header,Elf32_Shdr* shtab) {
 }
 
 ///////RECHERCHE de la section correspondant a la table des symboles SHT_DYNSYM
-int getIndSectionDynsym(Elf32_Ehdr header,Elf32_Shdr* shtab) {
+int getIndSectionDynsym(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
 	int i;
 	for(i=0;i<header.e_shnum;i++){
 		if (shtab[i].sh_type == 6) {

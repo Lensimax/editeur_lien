@@ -4,8 +4,8 @@
 #include "filereader.h"
 #include "elfsectiontab.h"
 
-/*Prend comme entree un Elf32_Ehdr et un Elf32_Shdr* et renvoit l'indice de la table de symbole Symtab de type 2 */
-int getIndSectionSymtab(Elf32_Ehdr header,Elf32_Shdr* shtab);
+/*Prend comme entree un Elf32_Ehdr * et un Elf32_Shdr* et renvoit l'indice de la table de symbole Symtab de type 2 */
+int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab);
 
 /*Prend comme entree un Elf32_Ehdr et un Elf32_Shdr* et renvoit l'indice de la table de symbole Symtab de type 6 */
 int getIndSectionDynsym(Elf32_Ehdr header,Elf32_Shdr* shtab);
