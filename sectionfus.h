@@ -13,4 +13,3 @@ typedef struct {
 
 int sectfusion (Elf32_Ehdr * header1, Elf32_Shdr * shtab1, const char *filepath1, Elf32_Ehdr * header2, Elf32_Shdr * shtab2, const char *filepath2, sect_tab * tab);
 
-void shfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1,   Elf32_Ehdr *header2, Elf32_Shdr * shtab2,const char *filePath2, sect_tab * tab);

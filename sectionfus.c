@@ -61,6 +61,7 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 			}
 		}
 	}
+	int num = header1->e_shnum;
 	for (int i=0; i<header2->e_shnum; i++) {
 		appartient = 0;
 		if (shtab2[i].sh_type == SHT_PROGBITS) {
@@ -73,8 +74,8 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 				if (cpt != 0)
 					tab = realloc(tab, sizeof(tab)+sizeof(sect_tab));
 				strcpy(tab[cpt].name,name1);
-				tab[cpt].num = header1->e_shnum;
-				header1->e_shnum++;
+				tab[cpt].num = num;
+				num++;
 				tab[cpt].sect = malloc(sizeof(char)*(shtab2[i].sh_size));
 				strncpy ((char*)tab[cpt].sect,(char*)(file2+shtab2[i].sh_offset), shtab2[i].sh_size);
 				tab[cpt].fichier=1;
@@ -87,11 +88,5 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 
 }
 
-
-void shfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1,   Elf32_Ehdr *header2, Elf32_Shdr * shtab2,const char *filePath2, sect_tab * tab){
-
-
-
-}
 
 
