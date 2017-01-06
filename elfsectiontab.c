@@ -2,59 +2,65 @@
 
 int readSectTab(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath){
  
-int j;
-FILE *f;
+	int j;
+	FILE *f;
 
-
-f = fopen(filePath, "r");
-
-if(f != NULL){
-	fseek(f, header->e_shoff, SEEK_SET);
+	//ouverture du fichier
+	f = fopen(filePath, "r");
 	
-	for (j=0; j<header->e_shnum; j++){
-		fread(&shtab[j], sizeof(Elf32_Shdr), 1, f);
-	}		
-	fclose(f);
+	//si l'ouverture a reussi
+	if(f != NULL){
+		//on se place en debut de table des sections
+		fseek(f, header->e_shoff, SEEK_SET);
 	
-	if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
-
-
+		//pour toutes les sections
 		for (j=0; j<header->e_shnum; j++){
+			//on rempli le shtab avec la section correpondante
+			fread(&shtab[j], sizeof(Elf32_Shdr), 1, f);
+		}	
+		//fermeture du fichier	
+		fclose(f);
+	
+		//inversion des octets si on a un problème de boutisme pour charque section
+		if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
 
-			shtab[j].sh_name = reverse_4(shtab[j].sh_name);
-			shtab[j].sh_type = reverse_4(shtab[j].sh_type);
-			shtab[j].sh_flags = reverse_4(shtab[j].sh_flags);
-			shtab[j].sh_addr = reverse_4(shtab[j].sh_addr);
-			shtab[j].sh_offset = reverse_4(shtab[j].sh_offset);
-			shtab[j].sh_size = reverse_4(shtab[j].sh_size);
-			shtab[j].sh_link = reverse_4(shtab[j].sh_link);
-			shtab[j].sh_info = reverse_4(shtab[j].sh_info);
-			shtab[j].sh_addralign = reverse_4(shtab[j].sh_addralign);
-			shtab[j].sh_entsize = reverse_4(shtab[j].sh_entsize);
+
+			for (j=0; j<header->e_shnum; j++){
+
+				shtab[j].sh_name = reverse_4(shtab[j].sh_name);
+				shtab[j].sh_type = reverse_4(shtab[j].sh_type);
+				shtab[j].sh_flags = reverse_4(shtab[j].sh_flags);
+				shtab[j].sh_addr = reverse_4(shtab[j].sh_addr);
+				shtab[j].sh_offset = reverse_4(shtab[j].sh_offset);
+				shtab[j].sh_size = reverse_4(shtab[j].sh_size);
+				shtab[j].sh_link = reverse_4(shtab[j].sh_link);
+				shtab[j].sh_info = reverse_4(shtab[j].sh_info);
+				shtab[j].sh_addralign = reverse_4(shtab[j].sh_addralign);
+				shtab[j].sh_entsize = reverse_4(shtab[j].sh_entsize);
 			
-		}
+			}
 
 		
+		}
+
+	//si l'ouverture a echoue
+	} else {
+		//affichage message d'erreur
+		printf("Probleme ouverture fichier(table section)\n");
+		return 0;
 	}
 
 
-} else {
-	printf("Probleme ouverture fichier(table section)\n");
-	return 0;
-}
-
-
-	return 1;
-}
+		return 1;
+	}
 
 
 
 /////// NOM DES TYPES
 
 char * nom_type(int i){
-	char* nom;
-	nom = malloc(sizeof(char)*30);
 
+	//recherche du type et retour de son nom correspondant
 	switch (i) {
 		case SHT_NULL:		 	return "NULL";
 		case SHT_PROGBITS:		return "PROGBITS";
@@ -89,32 +95,37 @@ char * nom_type(int i){
 		
 		default: return "";
 		}
-	return nom;
 }
 
 /////// NOM DES FLAGS
 
 char* nom_flags(unsigned int flags) {
 
+	//le nom d'un flag a une taille inferieure a 9 char
 	char* val = malloc(sizeof(char)*9);
 
+	//on met tous les char su string a zero (nb: on pourrait peut etre utiliser un calloc non..)
 	int p;
 	for(p=0;p<9;p++) {
 			val[p]='\0';
 	}
+	//initialisation des compteurs
 	int r;
 	int i = 1;
 	int b = 0;
+	//tant qu'on a pas ecrit tout le flag
 	while (flags != 0)
 	{
+		//on recupere le bit de poids faible et on ecrit le flag dans b
 		r = flags%2;
-        flags = flags/2;
-        b = b+r*i;
-        i = i*10;
+		flags = flags/2;
+		b = b+r*i;
+		i = i*10;
 	}
 
 
 
+	//on rempli val (= le nom du flag) en fonction de la valeur de b 
 	if (b & 00000001)
 	{
 		val[0]='W';
@@ -160,37 +171,45 @@ char* nom_flags(unsigned int flags) {
 
 void aff_Sheader(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath){
 
+//initialisation des compteurs
 int i, k;
+//initialisation du string qui contiendra le nom de section qu'on suppose inferieur a 50 char
 char * name;
-int ind_name;
-unsigned char* fileBytes = readFileBytes(filePath);
 name = malloc(sizeof(char)*50);
+int ind_name;
+//initialisation du tableau de char avec le contenu de filePath (cf filereader.h)
+unsigned char* fileBytes = readFileBytes(filePath);
 
 printf("\nLecture des headers de sections : \n\n");
-
+//affichage des entete de colonne du tableau 
 printf("  [Nr]  Nom\t\t        Type\t         Adr    \tDecala.\tTaille\tES\tFan\tLN\tInf\tAl\n");
 
+//pour chaque section
 for(i=0;i<header->e_shnum;i++){
 
-// Searching the name of the section
+	// recherche du nom d ela section
+		//placement en debut de table des strings
 		ind_name = shtab[header->e_shstrndx].sh_offset;
 		k = 0;
-		
+		//placement en debut de nom de section
 		ind_name =  ind_name + shtab[i].sh_name;
 		
+		//recuperation du nom de la section
 		while(fileBytes[ind_name] != '\0'){
 			name[k] = fileBytes[ind_name];
 			k++;
 			ind_name++;
 		}
+		//ajout de la marque de fin 
 		name[k]='\0';
 
-
+	//affichage des informations de chaque sections
 	printf("  [%2d] %-25s%-17s%08d\t%06x\t%06x\t%02x\t%-1.04s\t%d\t%d\t%d\n",i,name,nom_type(shtab[i].sh_type),shtab[i].sh_addr,shtab[i].sh_offset,shtab[i].sh_size,shtab[i].sh_entsize,nom_flags(shtab[i].sh_flags),shtab[i].sh_link,shtab[i].sh_info,shtab[i].sh_addralign);
 
 }
 
 printf (("\nClé des fanions:\t W (écriture), A (allocation), X (exécution), U (Valeur Inconnue)\n\n"));
+//liberation du nom
 free(name);
 
 }
