@@ -5,7 +5,7 @@
 
 
 
-void sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1,   Elf32_Ehdr *header2, Elf32_Shdr * shtab2,const char *filePath2, sect_tab * tab){
+int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1,   Elf32_Ehdr *header2, Elf32_Shdr * shtab2,const char *filePath2, sect_tab * tab){
 
 	unsigned char * file1 = readFileBytes(filePath1);
 	unsigned char * file2 = readFileBytes(filePath2);
@@ -37,6 +37,7 @@ void sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1,
 				}
 			}
 		}
+		
 
 	}
 	for (int i=0; i<header1->e_shnum; i++) {
