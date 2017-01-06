@@ -27,11 +27,9 @@ int main(int argc, char * argv[]){
 	Elf32_Rela **Relatab;
 	header = malloc(sizeof(Elf32_Ehdr));
 	int erreur = 0;
-	//int Indice_Reltab;
-	//int Indice_Relatab;
 	int indice_symtab;
 	char * file_used = "ARM.o";
-	//char section[50];
+	char section[50];
 
 	if(readHeader(file_used, header)){
 		
@@ -42,7 +40,7 @@ int main(int argc, char * argv[]){
 		if(readSectTab(shtab, header, file_used)){
 
 			aff_Sheader(shtab, header, file_used);			/////////AFFICHAGE HEADER SECTIONS///////////
-			/*printf("Choisir un nom ou un numero de section pour affichage complet :\n");
+			printf("Choisir un nom ou un numero de section pour affichage complet :\n");
 			scanf("%s", section);
 			printf("\n");
 			
@@ -53,7 +51,7 @@ int main(int argc, char * argv[]){
 			else{
 				read_section(file_used, *header, shtab, section, 1);				/////////AFFICHAGE UNE SECTION///////////
 			}
-			*/
+			
 			indice_symtab = getIndSectionSymtab(header,shtab);
 			
 			symtab = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtab].sh_size/shtab[indice_symtab].sh_entsize));
@@ -64,7 +62,7 @@ int main(int argc, char * argv[]){
 				// PARTIE REL/RELA
 				Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(header, shtab)));
 				Relatab = malloc(sizeof(Elf32_Rela*)*(nbIndSectionRelatab(header, shtab)));
-				readReloc(Reltab, Relatab, header, shtab, symtab, file_used, /*Indice_Reltab, Indice_Relatab,*/ 1);
+				readReloc(Reltab, Relatab, header, shtab, symtab, file_used, 1);
 
 			} else {
 				erreur = 1;
