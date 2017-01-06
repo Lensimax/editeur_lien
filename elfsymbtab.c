@@ -16,14 +16,14 @@ int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
 int getIndSectionDynsym(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
 	int i;
 	for(i=0;i<header->e_shnum;i++){
-		if (shtab[i].sh_type == 6) {
+		if (shtab[i].sh_type == 11) {
 			return i;
 		}
 	}
 	return 0;
 }
 
-///////LECTURE de la table des symboles
+///////LECTURE de la table des symboles////////////////////////////////////////////////////////////////////////////
 int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * shtab, Elf32_Sym * symtab ,char * filePath, int indice_symtab){
 	//initialisation compteur
 	int j;
@@ -75,8 +75,9 @@ int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * shtab, Elf32_Sym * symtab ,char 
 }
 
 
+
 ////////AFFICHAGE
-void aff_Symtable(Elf32_Shdr * shtab, Elf32_Ehdr header, char * filePath, Elf32_Sym * symtab, int indice_symtab){
+void aff_Symtable(Elf32_Shdr * shtab, Elf32_Ehdr header, char * filePath, Elf32_Sym * symtab, int indice_symtab, int dyn_or_not){
 
 	//remplissage du tableau de char avec le contenu du fichier filePath (cf readfile.h)
 	unsigned char* fileBytes = readFileBytes(filePath);
@@ -84,7 +85,13 @@ void aff_Symtable(Elf32_Shdr * shtab, Elf32_Ehdr header, char * filePath, Elf32_
 	//initialisation des variables
 	int j, bind, type, i,addrStrName;
 	int numSymb = 0;
-	printf("\n");
+	int trouve;
+		
+	if(dyn_or_not){
+		printf("Lecture de la table des symboles dynamiques :\n");
+	} else {
+		printf("Lecture de la table des symboles :\n");
+	}
 	//affichage des entete de colonne du tableau 
 	printf("  Num:    Valeur Tail   Type     Lien   Ndx Nom\n");
 
@@ -167,13 +174,29 @@ void aff_Symtable(Elf32_Shdr * shtab, Elf32_Ehdr header, char * filePath, Elf32_
 				printf("%3d",symtab[j].st_shndx);
 				break;
 		}
-
+		
 		//on cherche la section de table des noms de symboles (celle de type 3)
-		for(i=0;i<header.e_shnum;i++){
-			if(i != header.e_shstrndx && shtab[i].sh_type == 3){
+		if(dyn_or_not){
+		i=0;
+		trouve = 0;
+		while(i<=header.e_shnum && !trouve){
+			if(i != header.e_shstrndx && shtab[i].sh_type == 3){					
 				addrStrName = shtab[i].sh_offset;
+				trouve = 1;
+				
+			}
+			i++;
+		}
+		
+		}
+		else {
+			for(i=0;i<header.e_shnum;i++){
+				if(i != header.e_shstrndx && shtab[i].sh_type == 3){
+					addrStrName = shtab[i].sh_offset;					
+				}
 			}
 		}
+		
 
 		//on suppose le nom d'un symbole inferieur a 75 char
 		nameString = malloc(sizeof(char)*75);

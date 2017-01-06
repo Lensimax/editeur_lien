@@ -3,7 +3,7 @@
 #include <elf.h>
 #include "filereader.h"
 #include "elfsectiontab.h"
-
+#include "elfsection.h"
 /*Prend comme entree un Elf32_Ehdr * et un Elf32_Shdr* et renvoit l'indice de la table de symbole Symtab de type 2 */
 int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab);
 
@@ -16,4 +16,4 @@ int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char *
 
 /*Prend comme entree un Elf32_Ehdr, un Elf32_Shdr*, un nom de fichier ainsi que l'indice et la table de symbole choisie 
 et en affiche son contenu */
-void aff_Symtable(Elf32_Shdr * shtab, Elf32_Ehdr header, char * filePath, Elf32_Sym * symtab, int indice_symtab);
+void aff_Symtable(Elf32_Shdr * shtab, Elf32_Ehdr header, char * filePath, Elf32_Sym * symtab, int indice_symtab, int dyn_or_not);
