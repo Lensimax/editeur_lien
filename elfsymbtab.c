@@ -1,5 +1,6 @@
 #include "elfsymbtab.h"
 
+///////RECHERCHE de la section correspondant a la table des symboles SHT_SYMTAB
 int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
 
 	int i;
