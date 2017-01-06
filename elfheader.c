@@ -132,7 +132,7 @@ void aff_header(Elf32_Ehdr *header){
 	printf("[*] Début des entêtes de header : %d\n",header->e_phoff);
 
 	//affichage offset du debut des entetes de s
-	printf("[*] Début des entêtes de s : %d\n",header->e_shoff);
+	printf("[*] Début des entêtes de section : %d\n",header->e_shoff);
 
 	//affichage flags
 	printf("[*] Flags : 0x%x\n",header->e_flags);
@@ -147,13 +147,13 @@ void aff_header(Elf32_Ehdr *header){
 	printf("[*] Nombre d'entrées dans la table contenant l'entête de programme : %d\n",header->e_phnum );
 
 	//affichage taille d'une entree dans la table des entetes
-	printf("[*] Taille d'une entrée dans la table des entêtes de s : %d\n",header->e_shentsize);
+	printf("[*] Taille d'une entrée dans la table des entêtes de section : %d\n",header->e_shentsize);
 
 	//affichage nombre d'entrees dans la table des entetes
-	printf("[*] Nombre d'entrées dans la table des entêtes de s : %d\n",header->e_shnum);
+	printf("[*] Nombre d'entrées dans la table des entêtes de section : %d\n",header->e_shnum);
 
 	//affichage indice du nom des s
-	printf("[*] Indice des noms de s : %d\n",header->e_shstrndx);
+	printf("[*] Indice des noms de section : %d\n",header->e_shstrndx);
 
 
 
