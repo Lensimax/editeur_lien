@@ -61,7 +61,7 @@ void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *s
 		}
 
 		if(trouve){
-			printf("Section trouve %s\n", section_name;
+			printf("Section trouve %s numero %d\n", section_name, i);
 			isValid = 1;
 		} else {
 			printf("Fichier non trouve");
