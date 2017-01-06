@@ -83,6 +83,7 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 			}
 		}
 	}
+	return cpt;
 
 }
 
