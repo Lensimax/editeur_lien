@@ -23,12 +23,14 @@ int main(int argc, char * argv[]){
 	Elf32_Ehdr *header;
 	Elf32_Shdr *shtab;
 	Elf32_Sym *symtab;
+	Elf32_Sym *symtabDYN;
 	Elf32_Rel **Reltab;
 	Elf32_Rela **Relatab;
 	header = malloc(sizeof(Elf32_Ehdr));
 	int erreur = 0;
 	int indice_symtab;
-	char * file_used = "ARM.o";
+	int indice_symtabDYN = 0;
+	char * file_used = "hola";
 	char section[50];
 
 	if(readHeader(file_used, header)){
@@ -53,12 +55,23 @@ int main(int argc, char * argv[]){
 			}
 			
 			indice_symtab = getIndSectionSymtab(header,shtab);
-			
 			symtab = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtab].sh_size/shtab[indice_symtab].sh_entsize));
 
+			if(getIndSectionDynsym(header,shtab)){
+			indice_symtabDYN = getIndSectionDynsym(header,shtab);																//////////ALLOCATION SYMBOLES DYNAMIQUES////////////
+			symtabDYN = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtabDYN].sh_size/shtab[indice_symtabDYN].sh_entsize));			//////////ALLOCATION SYMBOLES DYNAMIQUES///////////	
+			}
+
 			if(readSymbtab(*header, shtab, symtab, file_used, indice_symtab)){
-				
-				aff_Symtable(shtab, *header, file_used, symtab, indice_symtab);
+				aff_Symtable(shtab, *header, file_used, symtab, indice_symtab,0);
+				if(indice_symtabDYN){
+					if(readSymbtab(*header, shtab, symtabDYN, file_used, indice_symtabDYN)){
+						aff_Symtable(shtab, *header, file_used, symtabDYN, indice_symtabDYN,1);
+					} else {
+						erreur = 1;
+					}	
+				}
+
 				// PARTIE REL/RELA
 				Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(header, shtab)));
 				Relatab = malloc(sizeof(Elf32_Rela*)*(nbIndSectionRelatab(header, shtab)));
