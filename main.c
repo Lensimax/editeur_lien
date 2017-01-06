@@ -66,7 +66,7 @@ int main(int argc, char * argv[]){
 				// PARTIE REL/RELA
 				//Reltab = malloc(sizeof(Elf32_Rel)*(shtab[Indice_Reltab].sh_size/shtab[Indice_Reltab].sh_entsize));
 				Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(header, shtab)));
-				Relatab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionRelatab(header, shtab)));
+				Relatab = malloc(sizeof(Elf32_Rela*)*(nbIndSectionRelatab(header, shtab)));
 				//if ( (int) shtab[Indice_Relatab].sh_entsize !=  0) 
 					//Relatab = malloc(sizeof(Elf32_Rela)*(shtab[Indice_Relatab].sh_size/shtab[Indice_Relatab].sh_entsize));
 				readReloc(Reltab, Relatab, header, shtab, symtab, file_used, /*Indice_Reltab, Indice_Relatab,*/ 1);
