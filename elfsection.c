@@ -34,6 +34,7 @@ void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *s
 	if(section_name[0] == '\0'){ // chaine vide faire avec l'index
 		if(!(section_index > header.e_shnum)){
 			section = Shtab[section_index-1];
+			name = nom_section(header, Shtab, section_index, fileBytes);
 		}
 		else {
 			printf("Veuillez choisir un numéro de section valable\n");
@@ -56,19 +57,22 @@ void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *s
 			}
 
 			name[k]='\0';
-			trouve = strcmp(name, section_name);
+			if(!strcmp(name, section_name)){
+				trouve = 1;
+			}
 			i++;
 		}
 
 		if(trouve){
-			printf("Section trouve %s numero %d\n", section_name, i);
+			
 			isValid = 1;
 		} else {
-			printf("Fichier non trouve");
 			trouve = 0;
+			isValid = 0;
+			printf("[Error] nom de section invalide\n");
 		}
 		
-		section = Shtab[i];
+		section = Shtab[i-1];
 
 	}
 		////// AFFICHAGE ///////
@@ -76,10 +80,7 @@ void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *s
 	
 	if (isValid == 1) {
 
-
-		name = nom_section(header, Shtab, section_index, fileBytes);
-
-		printf("Contenu de la section %s :\n", name); // a completer avec String Table
+		printf("Contenu de la section \" %s \" :\n", name); // a completer avec String Table
 
 		for(i=section.sh_offset; i<section.sh_offset+section.sh_size; i+=16){ // ligne
 
@@ -117,7 +118,7 @@ void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *s
 
 		}
 
-	}
+	} 
 	printf("\n");
 
 
