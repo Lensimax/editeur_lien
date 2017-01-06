@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+/*renvoi un tableau de char qui contient le contenu du fichier de nom *name */
 unsigned char* readFileBytes(const char *name);
 
 #endif
