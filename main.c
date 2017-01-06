@@ -9,6 +9,7 @@
 #include "elfsection.h"
 #include "util.h"
 #include "elfsymbtab.h"
+#include "elfreloc.h"
 
 
 int isnumber(const char*s) {
@@ -22,8 +23,12 @@ int main(int argc, char * argv[]){
 	Elf32_Ehdr *header;
 	Elf32_Shdr *shtab;
 	Elf32_Sym *symtab;
+	Elf32_Rel *Reltab;
+	Elf32_Rela *Relatab;
 	header = malloc(sizeof(Elf32_Ehdr));
 	int erreur = 0;
+	int Indice_Reltab;
+	int Indice_Relatab;
 	int indice_symtab;
 	char * file_used = "ARM.o";
 	//char section[50];
@@ -50,13 +55,20 @@ int main(int argc, char * argv[]){
 				read_section(file_used, *header, shtab, section, 1);				/////////AFFICHAGE UNE SECTION///////////
 			}
 			*/
-			indice_symtab = getIndSectionSymtab(*header,shtab);
+			indice_symtab = getIndSectionSymtab(header,shtab);
+			Indice_Relatab = getIndSectionRelatab(header, shtab);
+			Indice_Reltab = getIndSectionReltab(header, shtab);
 			
 			symtab = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtab].sh_size/shtab[indice_symtab].sh_entsize));
 
 			if(readSymbtab(*header, shtab, symtab, file_used, indice_symtab)){
 				
 				aff_Symtable(shtab, *header, file_used, symtab, indice_symtab);
+				// PARTIE REL/RELA
+				Reltab = malloc(sizeof(Elf32_Rel)*(shtab[Indice_Reltab].sh_size/shtab[Indice_Reltab].sh_entsize));
+				if ( (int) shtab[Indice_Relatab].sh_entsize !=  0) 
+					Relatab = malloc(sizeof(Elf32_Rela)*(shtab[Indice_Relatab].sh_size/shtab[Indice_Relatab].sh_entsize));
+				readReloc(Reltab, Relatab, header, shtab, symtab, file_used, Indice_Reltab, Indice_Relatab, 1);
 
 			} else {
 				erreur = 1;

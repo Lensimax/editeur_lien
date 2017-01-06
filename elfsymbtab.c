@@ -4,9 +4,9 @@
 
 
 
-int getIndSectionSymtab(Elf32_Ehdr header,Elf32_Shdr* shtab) {
+int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab) {
 	int i;
-	for(i=0;i<header.e_shnum;i++){
+	for(i=0;i<header->e_shnum;i++){
 		if (shtab[i].sh_type == 2) {
 			return i;
 		}

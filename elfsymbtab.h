@@ -4,7 +4,7 @@
 #include "filereader.h"
 #include "elfsectiontab.h"
 
-int getIndSectionSymtab(Elf32_Ehdr header,Elf32_Shdr* shtab);
+int getIndSectionSymtab(Elf32_Ehdr * header,Elf32_Shdr* shtab);
 
 int readSymbtab(Elf32_Ehdr header, Elf32_Shdr * Shtab,Elf32_Sym * Symtab ,char * filePath, int indice_symtab);
 
