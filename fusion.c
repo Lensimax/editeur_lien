@@ -87,11 +87,14 @@ for (int i=0; i<nbtab;i++){
 
 	realloc(text2, (sect_tab[i].size2)*sizeof(char))
 	fseek(file2,sect_tab[i].offset2,SEEK_SET)
-	fread(text2, 1, sect_tab[i].size1 , file2);
+	fread(text2, 1, sect_tab[i].size2 , file2);
 
-	
-	
-
+	for (int i=0; i<sect_tab[i].size1; i++){
+		affichebin1(text1[i]);
+	}
+	for (int i=0; i<sect_tab[i].size2; i++){
+		affichebin1(text2[i]);
+	}
 
 }
 
