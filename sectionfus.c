@@ -109,7 +109,7 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 				tab[cpt].size2=shtab2[j].sh_size;
 
 				shres[cpt]=shtab2[i];	//on récupère les information du header du premier fichier puis on modifie
-//////////////////////////////////////////////ATTENTION, il faut aussi modifier le nom en ajoutant la taillle de la table des strings de 1 à l'index (pour le momen ton a que l'index)
+				shres[cpt].sh_name += shtab1[header1->e_shstrndx].sh_size;
 				shres[cpt].sh_offset=place;
 				shres[cpt].sh_size=tab[cpt].size2;
 				place=place+shres[cpt].sh_size;
@@ -124,7 +124,7 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 			tab[cpt].size2=shtab2[j].sh_size;
 
 			shres[cpt]=shtab2[i];	//on récupère les information du header du premier fichier puis on modifie
-//////////////////////////////////////////////ATTENTION, il faut aussi modifier le nom en ajoutant la taillle de la table des strings de 1 à l'index (pour le momen ton a que l'index)
+			shres[cpt].sh_name += shtab1[header1->e_shstrndx].sh_size;
 			shres[cpt].sh_offset=place;
 			shres[cpt].sh_size=tab[cpt].size1;
 			place=place+shres[cpt].sh_size;
@@ -139,5 +139,4 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 	return cpt;
 
 }
-
 
