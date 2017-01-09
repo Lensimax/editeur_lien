@@ -43,17 +43,20 @@ int nbIndSectionRelatab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
 	return sum;
 }
 
-int readReloc(Elf32_Rel ** Reltab, Elf32_Rela ** Relatab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath, /*int Indice_Reltab, int Indice_Relatab,*/ int isVerbose) {
+int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath) {
   
   
-	unsigned char* fileBytes = readFileBytes(filePath);
-	int ind_name;
-	char name[256];
-	//int compt = 0;
-	int j, k, n;
+
+	int j, n;
 	FILE *f;
   
 	// PARTIE REL
+
+	/* c'est un peu porc */
+
+
+	///// A CHANGER /////
+
 	n = 0;
 	for (int i=0; i<header->e_shnum; i++) {
           if (IsIndSectionReltab(header, Shtab, i)) {
@@ -75,93 +78,29 @@ int readReloc(Elf32_Rel ** Reltab, Elf32_Rela ** Relatab, Elf32_Ehdr * header, E
 					}
 				}
 			} else {
-				printf("Probleme ouverture fichier(table section)\n");
+				printf("Probleme ouverture fichier(table reloc)\n");
 				return 0;
 			}			
-			if(isVerbose){
-					
-				// RECHERCHE DU NOM DE LA SECTION DE READRESSAGE	//
-				ind_name = Shtab[header->e_shstrndx].sh_offset;		//
-				k = 0;							//
-				//placement en debut de nom de section			//
-				ind_name =  ind_name + Shtab[i].sh_name;	//
-											//
-				//recuperation du nom de la section			//
-				while(fileBytes[ind_name] != '\0'){			//
-					name[k] = fileBytes[ind_name];			//
-					k++;						//
-					ind_name++;					//
-				}							//
-				//ajout de la marque de fin 				//
-				name[k]='\0';						//
-				// FIN DE LA RECHERCHE					//				
-				printf("Section de réadressage : %s\n", name);
-				
-				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){	
-					printf("[*] Offset : %x\n",Reltab[n][j].r_offset); // Sûrement faux
-					printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(Reltab[n][j].r_info)]);
-					printf("[*] Symbol Index : %x\n", ELF32_R_SYM(Reltab[n][j].r_info));
-				} 
-			}
+
 			n++;
 		}
 	}
   
-	// PARTIE RELA
-	n = 0;
-	for (int i=0; i<header->e_shnum; i++) {
-          if (IsIndSectionRelatab(header, Shtab, i)) {
-			f = fopen(filePath, "r");
-			if(f != NULL){
-				fseek(f, Shtab[i].sh_offset, SEEK_SET);
-				Relatab[n] = malloc(sizeof(Elf32_Rela)*(Shtab[i].sh_size/Shtab[i].sh_entsize));
-				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
-					fread(&Relatab[n][j], sizeof(Elf32_Rela), 1, f);
-				}		
-				fclose(f);
-		
-				if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
-  		
-  		
-					for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
-						Relatab[n][j].r_offset = reverse_4(Relatab[n][j].r_offset);
-						Relatab[n][j].r_info = reverse_4(Relatab[n][j].r_info);
-						Relatab[n][j].r_addend = reverse_4(Relatab[n][j].r_addend);
-					}
-				}
-			} else {
-				printf("Probleme ouverture fichier(table section)\n");
-				return 0;
-			}
-			if(isVerbose){
-					
-				// RECHERCHE DU NOM DE LA SECTION DE READRESSAGE	//
-				ind_name = Shtab[header->e_shstrndx].sh_offset;		//
-				k = 0;							//
-				//placement en debut de nom de section			//
-				ind_name =  ind_name + Shtab[i].sh_name;	//
-											//
-				//recuperation du nom de la section			//
-				while(fileBytes[ind_name] != '\0'){			//
-					name[k] = fileBytes[ind_name];			//
-					k++;						//
-					ind_name++;					//
-				}							//
-				//ajout de la marque de fin 				//
-				name[k]='\0';						//
-				// FIN DE LA RECHERCHE					//				
-				printf("Section de réadressage : %s\n", name);
-				
-				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){	
-					printf("[*] Offset : %x\n",Relatab[n][j].r_offset); // Sûrement faux
-					printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(Relatab[n][j].r_info)]);
-					printf("[*] Symbol Index : %x\n", ELF32_R_SYM(Relatab[n][j].r_info));
-					printf("[*] Addend : %d\n", Relatab[n][j].r_addend);
-				} 
-			}
-			n++;
-		}
-	}
+	
+	return 1;
+}
 
-return 0;
+void aff_Reloc(ELF_STRUCT file){
+	char *name;
+
+	for (int i=0; i<file.header->e_shnum; i++) {
+
+		name = nom_section(*file.header, file.shtab, i, file.file_name);
+
+		printf("Section de réadressage %d : %s\n",i, name);
+		
+		printf("[*] Offset : %x\n",file.Reltab[i].r_offset); // Sûrement faux
+		printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(file.Reltab[i].r_info)]);
+		printf("[*] Symbol Index : %x\n", ELF32_R_SYM(file.Reltab[i].r_info));
+	}
 }

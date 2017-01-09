@@ -5,10 +5,12 @@
 #include "filereader.h"
 #include "elfsectiontab.h"
 #include "util.h"
+#include "elfstruct.h"
+#include "elfsection.h"
 
 
 int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab);
 int nbIndSectionRelatab(Elf32_Ehdr * header, Elf32_Shdr * Shtab);
-int readReloc(Elf32_Rel ** Reltab, Elf32_Rela ** Relatab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath,/* int Indice_Reltab, int Indice_Relatab,*/ int isVerbose);
+int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath);
+void aff_Reloc(ELF_STRUCT file);
 
-int printReloc( Elf32_Sym * Symtab);

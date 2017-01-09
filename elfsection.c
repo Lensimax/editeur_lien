@@ -21,7 +21,7 @@ char *nom_section(Elf32_Ehdr header, Elf32_Shdr *Shtab, int section_index, unsig
 }
 
 
-void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *section_name, int section_index){
+void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *section_name, int section_index){
 
 	int i, k, l, trouve, ind_name;
 	unsigned char* fileBytes = readFileBytes(filePath);
@@ -30,6 +30,7 @@ void read_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *s
 	char *name;
 
 	////// RECHERCHE DE LA SECTION CORRESPONDANTE /////
+
 
 	if(section_name[0] == '\0'){ // chaine vide faire avec l'index
 		if(!(section_index > header.e_shnum)){

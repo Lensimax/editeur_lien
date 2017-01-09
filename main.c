@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <elf.h>
@@ -9,89 +10,178 @@
 #include "elfsection.h"
 #include "util.h"
 #include "elfsymbtab.h"
+#include "elfstruct.h"
 #include "elfreloc.h"
 
 
+
+
+int isnumber(const char*s);
+int est_present(char ch[], int argc, char* argv[]);
+
+int main(int argc, char* argv[]){
+
+	ELF_STRUCT file;
+
+	//unsigned char *nom;
+
+
+
+	int num_section;
+
+	if(argc == 1 || argc == 2){
+		printf("Veuillez mettre des options pour utiliser la commande, le dernier argument doit etre le fichier\n");
+		printf("%20s | pour tout afficher (meme chose que : -h -s -r)\n", "-a");
+		printf("%20s | pour afficher les infos du header\n", "-h");
+		printf("%20s | pour afficher les symboles\n", "-s");
+		printf("%20s | pour afficher la section de ce nom ou numéro\n", "-x <nombre/nom>");
+		printf("%20s | pour afficher les relocs\n", "-r");
+		printf("%20s | pour afficher les sections header\n", "-S");
+
+	} else {
+
+		////// REMPLISSAGE //////
+
+		//strcpy(argv[argc-1], argv[argc-1]);
+
+
+		file.fileBytes = readFileBytes(argv[argc-1]);
+
+		file.header = malloc(sizeof(Elf32_Ehdr));
+
+		if(readHeader(argv[argc-1], file.header)){
+			printf("Lecture header done!\n"); // DEBUG
+
+			file.shtab = malloc(sizeof(Elf32_Shdr)*file.header->e_shnum);
+
+			if(readSectTab(file.shtab, file.header, argv[argc-1])){
+				printf("Lecture sections header done!\n"); // DEBUG
+
+				file.indice_symtab = getIndSectionSymtab(file.header,file.shtab);
+				file.symtab = malloc(sizeof(Elf32_Sym)*(file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize));
+
+				if(readSymbtab(*file.header, file.shtab, file.symtab, argv[argc-1], file.indice_symtab)){
+					printf("Lecture symbole tab done!\n"); // DEBUG
+
+					file.Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(file.header, file.shtab)));
+
+					if(readReloc(&file.Reltab, file.header, file.shtab, file.symtab, argv[argc-1])){
+						printf("Lecture reloc done!\n"); // DEBUG
+
+
+
+					} else {
+						printf("[Error] Lecture Symbole tab\n"); // DEBUG
+						return 1;
+					}
+
+
+				} else {
+					printf("[Error] Lecture Symbole tab\n"); // DEBUG
+					return 1;
+				}
+
+			} else {
+				printf("[Error] Lecture SHTAB\n"); // DEBUG
+				return 1;
+			}
+
+		} else {
+			printf("[Error] Lecture HEADER\n"); // DEBUG
+			return 1;
+		}
+
+
+
+
+
+		/////////////// AFFICHAGE DE TOUT ////////
+		if(est_present("-a", argc, argv)){
+			printf("\n\t\t\t[ Affichage du header ]\n\n");
+			aff_header(file.header);
+			printf("\n\t\t\t[ Affichage des sections header ]\n\n");
+			aff_Sheader(file.shtab, file.header, argv[argc-1]);
+		} else {
+
+
+			//////////// AFFICHAGE HEADER /////////
+			if(est_present("-h", argc, argv)){
+				printf("\n\t\t\t[ Affichage du header ]\n\n");
+				aff_header(file.header);
+			}
+
+			/////// AFFICHAGE SECTION HEADER ////
+			if(est_present("-S", argc, argv)){
+				printf("\n\t\t\t[ Affichage des sections header ]\n\n");
+				aff_Sheader(file.shtab, file.header, argv[argc-1]);
+			}
+
+			//////////// AFFICHAGE DES SYMBOLES ////////
+			if(est_present("-s", argc, argv)){
+				printf("\n\t\t\t[ Affichage des symboles ]\n\n");
+				aff_Symtable(file.shtab, *file.header, argv[argc-1], file.symtab, file.indice_symtab,0);
+			}
+
+
+			////////// AFFICHAGE DE LA SECTION DONNEE//////////
+			num_section = est_present("-x", argc, argv);
+			if(num_section){
+				if(num_section+1<argc-1){
+					printf("\n\t\t\t[ Affichage de la section %s ]\n\n", argv[num_section+1]);
+					if(isnumber(argv[num_section+1])){
+						aff_section(argv[argc-1], *file.header, file.shtab, "", atoi(argv[num_section+1]));
+					} else {
+						aff_section(argv[argc-1], *file.header, file.shtab, argv[num_section+1], 1);
+					}
+				} else {
+					printf("[main.c] Error invalid section name\n");
+				}
+			}
+
+			if(est_present("-r", argc, argv)){
+				printf("\n\t\t\t[ Affichage des relocations ]\n\n");
+				aff_Reloc(file);
+			}
+
+			
+		}
+	}
+
+	free(file.header);
+	free(file.shtab);
+	free(file.symtab);
+	free(file.Reltab);
+
+	return 0;
+}
+
+
+////// FIN MAIN ///////
+
+
+ // renvoie si la chaine est un nombre
 int isnumber(const char*s) {
    char* e = NULL;
    (void) strtol(s, &e, 0);
    return e != NULL && *e == (char)0;
 }
 
-int main(int argc, char * argv[]){
 
-	Elf32_Ehdr *header;
-	Elf32_Shdr *shtab;
-	Elf32_Sym *symtab;
-	Elf32_Sym *symtabDYN;
-	Elf32_Rel **Reltab;
-	Elf32_Rela **Relatab;
-	header = malloc(sizeof(Elf32_Ehdr));
-	int erreur = 0;
-	int indice_symtab;
-	int indice_symtabDYN = 0;
-	char * file_used = "hola";
-	char section[50];
+// renvoie l'indice de l'option si elle est presente sinon 0
+int est_present(char ch[], int argc, char* argv[]){
 
-	if(readHeader(file_used, header)){
-		
-		//aff_header(header);				/////////AFFICHAGE HEADER///////////
-		
-		shtab = malloc(sizeof(Elf32_Shdr)*header->e_shnum);
+	int i = 1;
 
-		if(readSectTab(shtab, header, file_used)){
 
-			aff_Sheader(shtab, header, file_used);			/////////AFFICHAGE HEADER SECTIONS///////////
-			printf("Choisir un nom ou un numero de section pour affichage complet :\n");
-			scanf("%s", section);
-			printf("\n");
-			
-			if(isnumber(section)){
-				 
-				read_section(file_used, *header, shtab, "", atoi(section)+1);		/////////AFFICHAGE UNE SECTION///////////
-			}
-			else{
-				read_section(file_used, *header, shtab, section, 1);				/////////AFFICHAGE UNE SECTION///////////
-			}
-			
-			indice_symtab = getIndSectionSymtab(header,shtab);
-			symtab = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtab].sh_size/shtab[indice_symtab].sh_entsize));
+	while(i<argc-1 && !strcmp(ch, argv[i])){
+		i++;
+	}
 
-			if(getIndSectionDynsym(header,shtab)){
-			indice_symtabDYN = getIndSectionDynsym(header,shtab);																//////////ALLOCATION SYMBOLES DYNAMIQUES////////////
-			symtabDYN = malloc(sizeof(Elf32_Sym)*(shtab[indice_symtabDYN].sh_size/shtab[indice_symtabDYN].sh_entsize));			//////////ALLOCATION SYMBOLES DYNAMIQUES///////////	
-			}
-
-			if(readSymbtab(*header, shtab, symtab, file_used, indice_symtab)){
-				aff_Symtable(shtab, *header, file_used, symtab, indice_symtab,0);
-				if(indice_symtabDYN){
-					if(readSymbtab(*header, shtab, symtabDYN, file_used, indice_symtabDYN)){
-						aff_Symtable(shtab, *header, file_used, symtabDYN, indice_symtabDYN,1);
-					} else {
-						erreur = 1;
-					}	
-				}
-
-				// PARTIE REL/RELA
-				Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(header, shtab)));
-				Relatab = malloc(sizeof(Elf32_Rela*)*(nbIndSectionRelatab(header, shtab)));
-				readReloc(Reltab, Relatab, header, shtab, symtab, file_used, 1);
-
-			} else {
-				erreur = 1;
-			} 
-
-		} else {
-			erreur = 1;
-		}
-	
+	if(!strcmp(ch, argv[i-1])){
+		return i-1;
 	} else {
-		erreur = 1;
+		return 0;
 	}
 
-	if (!erreur){
-		return 1;
-	}
-
-	return 0;
 }
+
