@@ -1,42 +1,42 @@
 #include "elfsectiontab.h"
 
-int readSectTab(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath){
+int readSectTab(ELF_STRUCT file){
  
 	int j;
 	FILE *f;
 
 	//ouverture du fichier
-	f = fopen(filePath, "r");
+	f = fopen(file.file_name, "r");
 	
 	//si l'ouverture a reussi
 	if(f != NULL){
 		//on se place en debut de table des sections
-		fseek(f, header->e_shoff, SEEK_SET);
+		fseek(f, file.header->e_shoff, SEEK_SET);
 	
 		//pour toutes les sections
-		for (j=0; j<header->e_shnum; j++){
+		for (j=0; j<file.header->e_shnum; j++){
 			//on rempli le shtab avec la section correpondante
-			fread(&shtab[j], sizeof(Elf32_Shdr), 1, f);
+			fread(&file.shtab[j], sizeof(Elf32_Shdr), 1, f);
 		}	
 		//fermeture du fichier	
 		fclose(f);
 	
 		//inversion des octets si on a un problème de boutisme pour charque section
-		if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
+		if((file.header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((file.header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
 
 
-			for (j=0; j<header->e_shnum; j++){
+			for (j=0; j<file.header->e_shnum; j++){
 
-				shtab[j].sh_name = reverse_4(shtab[j].sh_name);
-				shtab[j].sh_type = reverse_4(shtab[j].sh_type);
-				shtab[j].sh_flags = reverse_4(shtab[j].sh_flags);
-				shtab[j].sh_addr = reverse_4(shtab[j].sh_addr);
-				shtab[j].sh_offset = reverse_4(shtab[j].sh_offset);
-				shtab[j].sh_size = reverse_4(shtab[j].sh_size);
-				shtab[j].sh_link = reverse_4(shtab[j].sh_link);
-				shtab[j].sh_info = reverse_4(shtab[j].sh_info);
-				shtab[j].sh_addralign = reverse_4(shtab[j].sh_addralign);
-				shtab[j].sh_entsize = reverse_4(shtab[j].sh_entsize);
+				file.shtab[j].sh_name = reverse_4(file.shtab[j].sh_name);
+				file.shtab[j].sh_type = reverse_4(file.shtab[j].sh_type);
+				file.shtab[j].sh_flags = reverse_4(file.shtab[j].sh_flags);
+				file.shtab[j].sh_addr = reverse_4(file.shtab[j].sh_addr);
+				file.shtab[j].sh_offset = reverse_4(file.shtab[j].sh_offset);
+				file.shtab[j].sh_size = reverse_4(file.shtab[j].sh_size);
+				file.shtab[j].sh_link = reverse_4(file.shtab[j].sh_link);
+				file.shtab[j].sh_info = reverse_4(file.shtab[j].sh_info);
+				file.shtab[j].sh_addralign = reverse_4(file.shtab[j].sh_addralign);
+				file.shtab[j].sh_entsize = reverse_4(file.shtab[j].sh_entsize);
 			
 			}
 
@@ -169,7 +169,7 @@ char* nom_flags(unsigned int flags) {
 
 ///////AFFICHAGE
 
-void aff_Sheader(Elf32_Shdr * shtab, Elf32_Ehdr * header, char * filePath){
+void aff_Sheader(ELF_STRUCT file){
 
 //initialisation des compteurs
 int i, k;
@@ -178,25 +178,24 @@ char * name;
 name = malloc(sizeof(char)*50);
 int ind_name;
 //initialisation du tableau de char avec le contenu de filePath (cf filereader.h)
-unsigned char* fileBytes = readFileBytes(filePath);
 
 printf("\nLecture des headers de sections : \n\n");
 //affichage des entete de colonne du tableau 
-printf("  [Nr]  Nom\t\t        Type\t         Adr    \tDecala.\tTaille\tES\tFan\tLN\tInf\tAl\n");
+printf("  [Nr] Nom\t\t        Type\t         Adr    \tDecala.\tTaille\tES\tFan\tLN\tInf\tAl\n");
 
 //pour chaque section
-for(i=0;i<header->e_shnum;i++){
+for(i=0;i<file.header->e_shnum;i++){
 
 	// recherche du nom d ela section
 		//placement en debut de table des strings
-		ind_name = shtab[header->e_shstrndx].sh_offset;
+		ind_name = file.shtab[file.header->e_shstrndx].sh_offset;
 		k = 0;
 		//placement en debut de nom de section
-		ind_name =  ind_name + shtab[i].sh_name;
+		ind_name =  ind_name + file.shtab[i].sh_name;
 		
 		//recuperation du nom de la section
-		while(fileBytes[ind_name] != '\0'){
-			name[k] = fileBytes[ind_name];
+		while(file.fileBytes[ind_name] != '\0'){
+			name[k] = file.fileBytes[ind_name];
 			k++;
 			ind_name++;
 		}
@@ -204,7 +203,7 @@ for(i=0;i<header->e_shnum;i++){
 		name[k]='\0';
 
 	//affichage des informations de chaque sections
-	printf("  [%2d] %-25s%-17s%08d\t%06x\t%06x\t%02x\t%-1.04s\t%d\t%d\t%d\n",i,name,nom_type(shtab[i].sh_type),shtab[i].sh_addr,shtab[i].sh_offset,shtab[i].sh_size,shtab[i].sh_entsize,nom_flags(shtab[i].sh_flags),shtab[i].sh_link,shtab[i].sh_info,shtab[i].sh_addralign);
+	printf("  [%2d] %-25s%-17s%08d\t%06x\t%06x\t%02x\t%-1.04s\t%d\t%d\t%d\n",i,name,nom_type(file.shtab[i].sh_type),file.shtab[i].sh_addr,file.shtab[i].sh_offset,file.shtab[i].sh_size,file.shtab[i].sh_entsize,nom_flags(file.shtab[i].sh_flags),file.shtab[i].sh_link,file.shtab[i].sh_info,file.shtab[i].sh_addralign);
 
 }
 

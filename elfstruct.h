@@ -21,7 +21,7 @@ typedef struct ELF_STRUCT {
 	int indice_symtab;
 
 	
-	unsigned char file_name[256];
+	char file_name[256];
 	unsigned char* fileBytes;
 
 } ELF_STRUCT;

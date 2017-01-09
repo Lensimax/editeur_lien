@@ -23,9 +23,6 @@ int main(int argc, char* argv[]){
 
 	ELF_STRUCT file;
 
-	//unsigned char *nom;
-
-
 
 	int num_section;
 
@@ -44,23 +41,23 @@ int main(int argc, char* argv[]){
 
 		//strcpy(argv[argc-1], argv[argc-1]);
 
-
+		strcpy(file.file_name, argv[argc-1]);
 		file.fileBytes = readFileBytes(argv[argc-1]);
 
 		file.header = malloc(sizeof(Elf32_Ehdr));
 
-		if(readHeader(argv[argc-1], file.header)){
+		if(readHeader(file)){
 			printf("Lecture header done!\n"); // DEBUG
 
 			file.shtab = malloc(sizeof(Elf32_Shdr)*file.header->e_shnum);
 
-			if(readSectTab(file.shtab, file.header, argv[argc-1])){
+			if(readSectTab(file)){
 				printf("Lecture sections header done!\n"); // DEBUG
 
 				file.indice_symtab = getIndSectionSymtab(file.header,file.shtab);
 				file.symtab = malloc(sizeof(Elf32_Sym)*(file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize));
 
-				if(readSymbtab(*file.header, file.shtab, file.symtab, argv[argc-1], file.indice_symtab)){
+				if(readSymbtab(file)){
 					printf("Lecture symbole tab done!\n"); // DEBUG
 
 					file.Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(file.header, file.shtab)));
@@ -98,30 +95,30 @@ int main(int argc, char* argv[]){
 		/////////////// AFFICHAGE DE TOUT ////////
 		if(est_present("-a", argc, argv)){
 			printf("\n\t\t\t[ Affichage du header ]\n\n");
-			aff_header(file.header);
+			aff_header(file);
 			printf("\n\t\t\t[ Affichage des sections header ]\n\n");
-			aff_Sheader(file.shtab, file.header, argv[argc-1]);
+			aff_Sheader(file);
 			printf("\n\t\t\t[ Affichage des symboles ]\n\n");
-			aff_Symtable(file.shtab, *file.header, argv[argc-1], file.symtab, file.indice_symtab,0);
+			aff_Symtable(file);
 		} else {
 
 
 			//////////// AFFICHAGE HEADER /////////
 			if(est_present("-h", argc, argv)){
 				printf("\n\t\t\t[ Affichage du header ]\n\n");
-				aff_header(file.header);
+				aff_header(file);
 			}
 
 			/////// AFFICHAGE SECTION HEADER ////
 			if(est_present("-S", argc, argv)){
 				printf("\n\t\t\t[ Affichage des sections header ]\n\n");
-				aff_Sheader(file.shtab, file.header, argv[argc-1]);
+				aff_Sheader(file);
 			}
 
 			//////////// AFFICHAGE DES SYMBOLES ////////
 			if(est_present("-s", argc, argv)){
 				printf("\n\t\t\t[ Affichage des symboles ]\n\n");
-				aff_Symtable(file.shtab, *file.header, argv[argc-1], file.symtab, file.indice_symtab,0);
+				aff_Symtable(file);
 			}
 
 

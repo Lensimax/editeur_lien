@@ -10,7 +10,6 @@
 
 
 int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab);
-int nbIndSectionRelatab(Elf32_Ehdr * header, Elf32_Shdr * Shtab);
 int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath);
 void aff_Reloc(ELF_STRUCT file);
 

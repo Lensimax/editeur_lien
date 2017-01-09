@@ -19,9 +19,6 @@ int IsIndSectionReltab(Elf32_Ehdr * header,Elf32_Shdr* shtab, int i) {
 	return shtab[i].sh_type == SHT_REL;
 }
 
-int IsIndSectionRelatab(Elf32_Ehdr * header,Elf32_Shdr* shtab, int i) {
-	return shtab[i].sh_type == SHT_RELA;
-}
 
 int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
 	int sum = 0;
@@ -33,20 +30,10 @@ int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
 	return sum;
 }
 
-int nbIndSectionRelatab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
-	int sum = 0;
-	for(int i=0;i<header->e_shnum;i++){
-		if (Shtab[i].sh_type == SHT_RELA) {
-			sum++;
-		}
-	}
-	return sum;
-}
+
 
 int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath) {
   
-  
-
 	int j, n;
 	FILE *f;
   
@@ -95,7 +82,7 @@ void aff_Reloc(ELF_STRUCT file){
 
 	for (int i=0; i<file.header->e_shnum; i++) {
 
-		name = nom_section(*file.header, file.shtab, i, file.file_name);
+		name = nom_section(*file.header, file.shtab, i, file.fileBytes);
 
 		printf("Section de réadressage %d : %s\n",i, name);
 		
