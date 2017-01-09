@@ -18,6 +18,12 @@ typedef struct ELF_STRUCT {
 	int str_table_idx; // 6e
 	int symb_table_idx; // 6e
 
+	int indice_symtab;
+
+	
+	unsigned char file_name[256];
+	unsigned char* fileBytes;
+
 } ELF_STRUCT;
 
 #endif 
