@@ -54,8 +54,8 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 		tab[cpt].size1=shtab1[i].sh_size;
 		tab[cpt].offs2=0;
 		tab[cpt].size2=0;
+		cpt++;
 		}
-		
 		free(name1);
 		tab[cpt].type=shtab1[i].sh_type;
 	}
@@ -86,13 +86,15 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 			tab[cpt].size1=0;
 			tab[cpt].offs2=shtab2[j].sh_offset;
 			tab[cpt].size2=shtab2[j].sh_size;
+			cpt++;
 		}
 		free(name1);
+		tab[cpt].newnum = cpt;
+		tab[cpt].numorign = i;
 		tab[cpt].type=shtab1[i].sh_type;
 	}
 	return cpt;
 
 }
-
 
 
