@@ -82,7 +82,7 @@ void aff_Reloc(ELF_STRUCT file){
 
 	for (int i=0; i<file.header->e_shnum; i++) {
 
-		name = nom_section(*file.header, file.shtab, i, file.fileBytes);
+		name = nom_section(file, i);
 
 		printf("Section de réadressage %d : %s\n",i, name);
 		

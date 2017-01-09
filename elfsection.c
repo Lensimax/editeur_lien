@@ -2,16 +2,16 @@
 
 //////// RETOURNE LE NOM SELON L INDEX DONNEE
 
-char *nom_section(Elf32_Ehdr header, Elf32_Shdr *Shtab, int section_index, unsigned char* fileBytes){
+char *nom_section(ELF_STRUCT file, int section_index){
 	int k = 0, ind_name;
 	char *name;
 	name = malloc(sizeof(char)*256);
 
 
-	ind_name = Shtab[header.e_shstrndx].sh_offset;
-	ind_name += Shtab[section_index-1].sh_name;
-	while(fileBytes[ind_name] != '\0'){
-		name[k] = fileBytes[ind_name];
+	ind_name = file.shtab[file.header->e_shstrndx].sh_offset;
+	ind_name += file.shtab[section_index-1].sh_name;
+	while(file.fileBytes[ind_name] != '\0'){
+		name[k] = file.fileBytes[ind_name];
 		k++;
 		ind_name++;
 	}
@@ -21,10 +21,9 @@ char *nom_section(Elf32_Ehdr header, Elf32_Shdr *Shtab, int section_index, unsig
 }
 
 
-void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *section_name, int section_index){
+void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 
 	int i, k, l, trouve, ind_name;
-	unsigned char* fileBytes = readFileBytes(filePath);
 	Elf32_Shdr section;
 	int isValid = 1;
 	char *name;
@@ -33,9 +32,9 @@ void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *se
 
 
 	if(section_name[0] == '\0'){ // chaine vide faire avec l'index
-		if(!(section_index > header.e_shnum)){
-			section = Shtab[section_index-1];
-			name = nom_section(header, Shtab, section_index, fileBytes);
+		if(!(section_index > file.header->e_shnum)){
+			section = file.shtab[section_index-1];
+			name = nom_section(file, section_index);
 		}
 		else {
 			printf("Veuillez choisir un numéro de section valable\n");
@@ -48,11 +47,11 @@ void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *se
 		i = 0;
 		trouve = 0;
 		
-		while(i<header.e_shnum && !trouve){
-			ind_name = Shtab[header.e_shstrndx].sh_offset + Shtab[i].sh_name;
+		while(i<file.header->e_shnum && !trouve){
+			ind_name = file.shtab[file.header->e_shstrndx].sh_offset + file.shtab[i].sh_name;
 			k = 0;
-			while(fileBytes[ind_name] != '\0'){
-				name[k] = fileBytes[ind_name];
+			while(file.fileBytes[ind_name] != '\0'){
+				name[k] = file.fileBytes[ind_name];
 				k++;
 				ind_name++;
 			}
@@ -73,7 +72,7 @@ void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *se
 			printf("[Error] nom de section invalide\n");
 		}
 		
-		section = Shtab[i-1];
+		section = file.shtab[i-1];
 
 	}
 		////// AFFICHAGE ///////
@@ -90,7 +89,7 @@ void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *se
 			for(k=0; k<4; k++){ /// affichage de l'hexa
 				l=i+k*4;
 				while(l<i+(k+1)*4 && l<section.sh_offset+section.sh_size){
-					printf("%.2x", fileBytes[l]);
+					printf("%.2x", file.fileBytes[l]);
 					l++;
 				}
 
@@ -106,8 +105,8 @@ void aff_section(char * filePath, Elf32_Ehdr header, Elf32_Shdr *Shtab, char *se
 			for(k=0; k<4; k++){ //// affichage des caractère
 				l=i+k*4;
 				while(l<i+(k+1)*4 && l<section.sh_offset+section.sh_size){
-					if(fileBytes[l] >= 33 && fileBytes[l] < 128){
-						printf("%c", fileBytes[l]);						
+					if(file.fileBytes[l] >= 33 && file.fileBytes[l] < 128){
+						printf("%c", file.fileBytes[l]);						
 					} else {
 						printf(".");
 					}

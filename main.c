@@ -128,9 +128,9 @@ int main(int argc, char* argv[]){
 				if(num_section+1<argc-1){
 					printf("\n\t\t\t[ Affichage de la section %s ]\n\n", argv[num_section+1]);
 					if(isnumber(argv[num_section+1])){
-						aff_section(argv[argc-1], *file.header, file.shtab, "", atoi(argv[num_section+1]));
+						aff_section(file, "", atoi(argv[num_section+1]));
 					} else {
-						aff_section(argv[argc-1], *file.header, file.shtab, argv[num_section+1], 1);
+						aff_section(file, argv[num_section+1], 1);
 					}
 				} else {
 					printf("[main.c] Error invalid section name\n");
@@ -175,7 +175,8 @@ int est_present(char ch[], int argc, char* argv[]){
 	int i = 1;
 
 
-	while(i<argc-1 && !strcmp(ch, argv[i])){
+	while(i<argc-1 && !strcmp(ch, argv[i-1])){
+		printf(" Test %s %d %d\n", argv[i], i, argc-1);
 		i++;
 	}
 
