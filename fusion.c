@@ -50,8 +50,12 @@ void affichebin4(Elf32_Half n)
 
 
 
-void fuuuuusion(Elf32_Ehdr * header, Elf32_Shdr * shtab, Elf32_Sym * symtab, sect_tab * tab Elf32_Rel ** Reltab, Elf32_Rela ** Relatab, const char *filepath ){
+void fuuuuusion(Elf32_Ehdr * header, sect_tab * tab, int nbtab,char *filePath1, char *filePath2){
 
+FILE *file1=fopen(filePath1, "r");
+FILE *file2=fopen(filePath2, "r");		
+char *text1;
+char *text2;
 
 affichebin1(header->e_ident[EI_MAG0]);
 affichebin1(header->e_ident[EI_MAG1]);
@@ -75,6 +79,21 @@ affichebin2(header->e_phnum);
 affichebin2(header->e_shentsize);
 affichebin2(header->e_shnum);
 affichebin2(header->e_shstrndx);
+for (int i=0; i<nbtab;i++){
+
+	realloc(text1, (sect_tab[i].size1)*sizeof(char))
+	fseek(file1,sect_tab[i].offset1,SEEK_SET)
+	fread(text1, 1, sect_tab[i].size1 , file1);	
+
+	realloc(text2, (sect_tab[i].size2)*sizeof(char))
+	fseek(file2,sect_tab[i].offset2,SEEK_SET)
+	fread(text2, 1, sect_tab[i].size1 , file2);
+
+	
+	
+
+
+}
 
 
 }
