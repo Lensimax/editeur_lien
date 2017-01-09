@@ -1,7 +1,7 @@
 #include "elfsection.h"
 #include "elfheader.h"
 #include "filereader.h"
-#include "sectionfus2.h"
+#include "sectionfus.h"
 
 
 
@@ -90,7 +90,7 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 		}
 		free(name1);
 		tab[cpt].newnum = cpt;
-		tab[cpt].numorign = i;
+		tab[cpt].numorigin = i;
 		tab[cpt].type=shtab1[i].sh_type;
 	}
 	return cpt;
