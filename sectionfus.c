@@ -11,18 +11,21 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 	unsigned char * file2 = readFileBytes(filePath2);
 	char * name1;
 	char * name2;
-
+	free(tab);	//mise a zero de la table
 	tab = malloc(sizeof(sect_tab)); 
 	int cpt = 0;
 	int appartient;
+	int j =0;
 
 	for (int i = 0; i < header1->e_shnum; i++){
-		if (shtab1[i].sh_type == SHT_PROGBITS){
+		if (shtab1[i].sh_type == SHT_PROGBITS){		//si c'est un progbits (on pourrait stoquer toutes les sections non... mais dans ce cas faut mettre type dans la structure
+			appartient=0;
 			name1 = nom_section(*header1, shtab1,i ,file1);
-			for (int j = 0; j < header2->e_shnum; j++){
+			for (j = 0; j < header2->e_shnum; j++){		//on pourrait mettre while pour raccourcir la boucle surtout que y'a qu'une section progbit avec le meme nom dans le 2
 				if (shtab2[j].sh_type == SHT_PROGBITS){
 					name2 = nom_section(*header2, shtab2, j ,file2);
 					if (strcmp(name1,name2)==0){
+						appartient=1;			//on a trouvé deux noms correspondants
 						if (cpt != 0)
 							tab = realloc(tab, sizeof(tab)+sizeof(sect_tab));
 						strcpy(tab[cpt].name,name1);
@@ -34,21 +37,10 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 						tab[cpt].numsection=i;
 						cpt++;
 					}
+					free(name2);
 				}
 			}
-		}
-		
-
-	}
-	for (int i=0; i<header1->e_shnum; i++) {
-		appartient = 0;
-		if (shtab1[i].sh_type == SHT_PROGBITS) {
-			for (int j = 0; j<cpt; j++) {
-				name1 = nom_section(*header1, shtab1,i ,file1); 
-				if (strcmp(name1, tab[j].name) == 0)
-					appartient = 1;
-			}
-			if (!appartient) {
+			if (!appartient){			//si on a pas trouvé de nom correspondant
 				if (cpt != 0)
 					tab = realloc(tab, sizeof(tab)+sizeof(sect_tab));
 				strcpy(tab[cpt].name,name1);
@@ -58,17 +50,25 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 				tab[cpt].fichier=0;
 				tab[cpt].numsection=i;
 				cpt++;
+			
 			}
 		}
+		free(name1);
+		
+
 	}
+	//copie des sections de type progbit du deuxieme fichier qui n'ont pas le meme nom que celles du premier
 	int num = header1->e_shnum;
 	for (int i=0; i<header2->e_shnum; i++) {
 		appartient = 0;
+		name1 = nom_section(*header2, shtab2, i ,file2); 
 		if (shtab2[i].sh_type == SHT_PROGBITS) {
-			for (int j = 0; j<cpt; j++) {
-				name1 = nom_section(*header2, shtab2,i ,file2); 
-				if (strcmp(name1, tab[j].name) == 0)
+			j=0;
+			while((j<cpt)&&(!appartient)){
+				if (strcmp(name1, tab[j].name) == 0){
 					appartient = 1;
+				}
+				j++;
 			}
 			if (!appartient) {
 				if (cpt != 0)
@@ -83,6 +83,7 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 				cpt++;
 			}
 		}
+		free(name1);
 	}
 	return cpt;
 
