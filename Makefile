@@ -17,4 +17,4 @@ elfsymbtab.o: elfsymbtab.h elfsectiontab.h filereader.h
 elfreloc.o: elfreloc.h elfsectiontab.h filereader.h util.h elfsection.h
 sectionfus.o: elfheader.h elfsectiontab.h filereader.h sectionfus.h
 clean:
-	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o
+	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o lecture
