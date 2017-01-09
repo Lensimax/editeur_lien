@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <elf.h>
-#include <getopt.h>
-#include <sys/stat.h>
-#include <string.h>
 #include "elfheader.h"
 #include "elfsectiontab.h"
 #include "elfsection.h"
-#include "util.h"
 #include "elfsymbtab.h"
 #include "elfreloc.h"
+#include "fusion.h"
+
 
 void affichebin1(unsigned char n)
 {
@@ -50,7 +48,7 @@ void affichebin4(Elf32_Half n)
 
 
 
-void fuuuuusion(Elf32_Ehdr * header, sect_tab * tab, int nbtab,char *filePath1, char *filePath2){
+void fusion(Elf32_Ehdr * header, sect_tab * tab, int nbtab,char *filePath1, char *filePath2){
 
 FILE *file1=fopen(filePath1, "r");
 FILE *file2=fopen(filePath2, "r");		
@@ -81,18 +79,18 @@ affichebin2(header->e_shnum);
 affichebin2(header->e_shstrndx);
 for (int i=0; i<nbtab;i++){
 
-	realloc(text1, (sect_tab[i].size1)*sizeof(char))
-	fseek(file1,sect_tab[i].offset1,SEEK_SET)
-	fread(text1, 1, sect_tab[i].size1 , file1);	
+	text1=realloc(text1, ((tab[i].size1)*sizeof(char)));
+	fseek(file1,tab[i].offset1,SEEK_SET);
+	fread(text1, 1, tab[i].size1 , file1);	
 
-	realloc(text2, (sect_tab[i].size2)*sizeof(char))
-	fseek(file2,sect_tab[i].offset2,SEEK_SET)
-	fread(text2, 1, sect_tab[i].size2 , file2);
+	text2=realloc(text2, ((tab[i].size2)*sizeof(char)));
+	fseek(file2,tab[i].offset2,SEEK_SET);
+	fread(text2, 1, tab[i].size2 , file2);
 
-	for (int i=0; i<sect_tab[i].size1; i++){
+	for (int i=0; i<tab[i].size1; i++){
 		affichebin1(text1[i]);
 	}
-	for (int i=0; i<sect_tab[i].size2; i++){
+	for (int i=0; i<tab[i].size2; i++){
 		affichebin1(text2[i]);
 	}
 
