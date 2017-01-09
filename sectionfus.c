@@ -81,6 +81,8 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 		cpt++;
 		}
 		free(name1);
+		tab[cpt].newnum = cpt;
+		tab[cpt].numorigin = cpt;
 		tab[cpt].type=shtab1[i].sh_type;
 	}
 	//copie des sections de type progbit du deuxieme fichier qui n'ont pas le meme nom que celles du premier
