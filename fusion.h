@@ -23,5 +23,5 @@ void affichebin4(Elf32_Half n);
 
 
 
-void fusion(Elf32_Ehdr * header, sect_tab * tab, int nbtab,char *filePath1, char *filePath2);
+void fusion(Elf32_Ehdr * header,Elf32_Shdr * shtab, sect_tab * tab, int nbtab,char *filePath1, char *filePath2);
 
