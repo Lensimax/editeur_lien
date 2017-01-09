@@ -31,7 +31,7 @@ int main(int argc, char* argv[]){
 
 	if(argc == 1 || argc == 2){
 		printf("Veuillez mettre des options pour utiliser la commande, le dernier argument doit etre le fichier\n");
-		printf("%20s | pour tout afficher (meme chose que : -h -s -r)\n", "-a");
+		printf("%20s | pour tout afficher (meme chose que : -h -s -r -S)\n", "-a");
 		printf("%20s | pour afficher les infos du header\n", "-h");
 		printf("%20s | pour afficher les symboles\n", "-s");
 		printf("%20s | pour afficher la section de ce nom ou numéro\n", "-x <nombre/nom>");
@@ -101,6 +101,8 @@ int main(int argc, char* argv[]){
 			aff_header(file.header);
 			printf("\n\t\t\t[ Affichage des sections header ]\n\n");
 			aff_Sheader(file.shtab, file.header, argv[argc-1]);
+			printf("\n\t\t\t[ Affichage des symboles ]\n\n");
+			aff_Symtable(file.shtab, *file.header, argv[argc-1], file.symtab, file.indice_symtab,0);
 		} else {
 
 
@@ -140,7 +142,10 @@ int main(int argc, char* argv[]){
 
 			if(est_present("-r", argc, argv)){
 				printf("\n\t\t\t[ Affichage des relocations ]\n\n");
-				aff_Reloc(file);
+
+				////// A CHANGER DANS LE ELFRELOC //// 
+
+				//aff_Reloc(file); 
 			}
 
 			
