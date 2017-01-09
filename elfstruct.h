@@ -8,7 +8,7 @@ typedef struct ELF_STRUCT {
 
 	FILE* file; // Nom du fichier, init en 1er
 	Elf32_Ehdr *header; //Elf header, init en 2e
-	Elf32_Shdr *shtab // 4e
+	Elf32_Shdr *shtab; // 4e
 	Elf32_Sym *symtab; // 7e
 	Elf32_Rela *Relatab; // 8e
 	Elf32_Rel *Reltab; // 8e
