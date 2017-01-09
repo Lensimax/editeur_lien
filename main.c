@@ -150,12 +150,12 @@ int main(int argc, char* argv[]){
 
 			
 		}
+		free(file.header);
+		free(file.shtab);
+		free(file.symtab);
+		free(file.Reltab);
 	}
 
-	free(file.header);
-	free(file.shtab);
-	free(file.symtab);
-	free(file.Reltab);
 
 	return 0;
 }
