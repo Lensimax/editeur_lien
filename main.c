@@ -93,7 +93,7 @@ int main(int argc, char* argv[]){
 
 
 		/////////////// AFFICHAGE DE TOUT ////////
-		if(est_present("-a", argc, argv)){
+		if(est_present("-a", argc, argv) != 0){
 			printf("\n\t\t\t[ Affichage du header ]\n\n");
 			aff_header(file);
 			printf("\n\t\t\t[ Affichage des sections header ]\n\n");
@@ -104,19 +104,19 @@ int main(int argc, char* argv[]){
 
 
 			//////////// AFFICHAGE HEADER /////////
-			if(est_present("-h", argc, argv)){
+			if(est_present("-h", argc, argv) != 0){
 				printf("\n\t\t\t[ Affichage du header ]\n\n");
 				aff_header(file);
 			}
 
 			/////// AFFICHAGE SECTION HEADER ////
-			if(est_present("-S", argc, argv)){
+			if(est_present("-S", argc, argv) != 0){
 				printf("\n\t\t\t[ Affichage des sections header ]\n\n");
 				aff_Sheader(file);
 			}
 
 			//////////// AFFICHAGE DES SYMBOLES ////////
-			if(est_present("-s", argc, argv)){
+			if(est_present("-s", argc, argv) != 0){
 				printf("\n\t\t\t[ Affichage des symboles ]\n\n");
 				aff_Symtable(file);
 			}
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]){
 
 			////////// AFFICHAGE DE LA SECTION DONNEE//////////
 			num_section = est_present("-x", argc, argv);
-			if(num_section){
+			if(num_section != 0){
 				if(num_section+1<argc-1){
 					printf("\n\t\t\t[ Affichage de la section %s ]\n\n", argv[num_section+1]);
 					if(isnumber(argv[num_section+1])){
@@ -170,18 +170,15 @@ int isnumber(const char*s) {
 
 
 // renvoie l'indice de l'option si elle est presente sinon 0
-int est_present(char ch[], int argc, char* argv[]){
-
+int est_present(char ch[], int argc, char *argv[]){
 	int i = 1;
 
-
-	while(i<argc-1 && !strcmp(ch, argv[i-1])){
-		printf(" Test %s %d %d\n", argv[i], i, argc-1);
+	while(i<argc-1 && strcmp(ch, argv[i])){
 		i++;
-	}
+	} 
 
-	if(!strcmp(ch, argv[i-1])){
-		return i-1;
+	if(strcmp(ch, argv[i]) == 0){
+		return i;
 	} else {
 		return 0;
 	}

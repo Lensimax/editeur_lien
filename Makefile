@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g -std=c99
 
-main: main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o 
+lecture: main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o 
 	$(CC) -o $@ $^
 
 %.o: %.c                          

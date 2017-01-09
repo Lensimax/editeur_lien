@@ -9,7 +9,7 @@ char *nom_section(ELF_STRUCT file, int section_index){
 
 
 	ind_name = file.shtab[file.header->e_shstrndx].sh_offset;
-	ind_name += file.shtab[section_index-1].sh_name;
+	ind_name += file.shtab[section_index].sh_name;
 	while(file.fileBytes[ind_name] != '\0'){
 		name[k] = file.fileBytes[ind_name];
 		k++;
@@ -33,7 +33,7 @@ void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 
 	if(section_name[0] == '\0'){ // chaine vide faire avec l'index
 		if(!(section_index > file.header->e_shnum)){
-			section = file.shtab[section_index-1];
+			section = file.shtab[section_index];
 			name = nom_section(file, section_index);
 		}
 		else {
@@ -71,8 +71,8 @@ void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 			isValid = 0;
 			printf("[Error] nom de section invalide\n");
 		}
-		
 		section = file.shtab[i-1];
+
 
 	}
 		////// AFFICHAGE ///////
@@ -80,7 +80,7 @@ void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 	
 	if (isValid == 1) {
 
-		printf("Contenu de la section \" %s \" :\n", name); // a completer avec String Table
+		printf("Contenu de la section << %s >>\n", name); // a completer avec String Table
 
 		for(i=section.sh_offset; i<section.sh_offset+section.sh_size; i+=16){ // ligne
 
