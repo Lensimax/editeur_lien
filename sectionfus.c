@@ -4,7 +4,6 @@
 #include "sectionfus.h"
 
 
-
 int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1,   Elf32_Ehdr *header2, Elf32_Shdr * shtab2,const char *filePath2, Elf32_Shdr * shres, sect_tab * tab){
 
 	unsigned char * file1 = readFileBytes(filePath1);
@@ -107,7 +106,8 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 				tab[cpt].offset2=shtab2[j].sh_offset;
 				tab[cpt].size2=shtab2[j].sh_size;
 
-				shres[cpt]=shtab1[i];	//on récupère les information du header du premier fichier puis on modifie
+				shres[cpt]=shtab2[i];	//on récupère les information du header du premier fichier puis on modifie
+//////////////////////////////////////////////ATTENTION, il faut aussi modifier le nom en ajoutant la taillle de la table des strings de 1 à l'index (pour le momen ton a que l'index)
 				shres[cpt].sh_offset=place;
 				shres[cpt].sh_size=tab[cpt].size2;
 				place=place+shres[cpt].sh_size;
@@ -121,7 +121,8 @@ int sectfusion( Elf32_Ehdr *header1, Elf32_Shdr * shtab1,const char *filePath1, 
 			tab[cpt].offset2=shtab2[j].sh_offset;
 			tab[cpt].size2=shtab2[j].sh_size;
 
-			shres[cpt]=shtab1[i];	//on récupère les information du header du premier fichier puis on modifie
+			shres[cpt]=shtab2[i];	//on récupère les information du header du premier fichier puis on modifie
+//////////////////////////////////////////////ATTENTION, il faut aussi modifier le nom en ajoutant la taillle de la table des strings de 1 à l'index (pour le momen ton a que l'index)
 			shres[cpt].sh_offset=place;
 			shres[cpt].sh_size=tab[cpt].size1;
 			place=place+shres[cpt].sh_size;
