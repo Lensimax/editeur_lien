@@ -12,6 +12,7 @@
 #include "elfsymbtab.h"
 #include "elfstruct.h"
 #include "elfreloc.h"
+#include "fill_struct.h"
 
 
 
@@ -41,119 +42,74 @@ int main(int argc, char* argv[]){
 
 		//strcpy(argv[argc-1], argv[argc-1]);
 
-		strcpy(file.file_name, argv[argc-1]);
-		file.fileBytes = readFileBytes(argv[argc-1]);
+		if(fill(&file, argv[argc-1])){
+			
 
-		file.header = malloc(sizeof(Elf32_Ehdr));
-
-		if(readHeader(file)){
-			printf("Lecture header done!\n"); // DEBUG
-
-			file.shtab = malloc(sizeof(Elf32_Shdr)*file.header->e_shnum);
-
-			if(readSectTab(file)){
-				printf("Lecture sections header done!\n"); // DEBUG
-
-				file.indice_symtab = getIndSectionSymtab(file.header,file.shtab);
-				file.symtab = malloc(sizeof(STRUCT_SYM)*(file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize));
-				
-				
-				if(readSymbtab(file)){
-					printf("Lecture symbole tab done!\n"); // DEBUG
-
-					file.tabrel = malloc(sizeof(STRUCT_REL)*(nbIndSectionReltab(file)));
-
-					if(readReloc(file)){
-						printf("Lecture reloc done!\n"); // DEBUG
-
-
-
-					} else {
-						printf("[Error] Lecture Symbole tab\n"); // DEBUG
-						return 1;
-					}
-
-
-				} else {
-					printf("[Error] Lecture Symbole tab\n"); // DEBUG
-					return 1;
-				}
-
-			} else {
-				printf("[Error] Lecture SHTAB\n"); // DEBUG
-				return 1;
-			}
-
-		} else {
-			printf("[Error] Lecture HEADER\n"); // DEBUG
-			return 1;
-		}
-
-
-
-
-
-		/////////////// AFFICHAGE DE TOUT ////////
-		if(est_present("-a", argc, argv) != 0){
-			printf("\n\t\t\t[ Affichage du header ]\n\n");
-			aff_header(file);
-			printf("\n\t\t\t[ Affichage des sections header ]\n\n");
-			aff_Sheader(file);
-			printf("\n\t\t\t[ Affichage des symboles ]\n\n");
-			aff_Symtable(file);
-			printf("\n\t\t\t[ Affichage des relocations ]\n\n");
-			aff_Reloc(file); 
-		} else {
-
-
-			//////////// AFFICHAGE HEADER /////////
-			if(est_present("-h", argc, argv) != 0){
+			/////////////// AFFICHAGE DE TOUT ////////
+			if(est_present("-a", argc, argv) != 0){
 				printf("\n\t\t\t[ Affichage du header ]\n\n");
 				aff_header(file);
-			}
-
-			/////// AFFICHAGE SECTION HEADER ////
-			if(est_present("-S", argc, argv) != 0){
 				printf("\n\t\t\t[ Affichage des sections header ]\n\n");
 				aff_Sheader(file);
-			}
-
-			//////////// AFFICHAGE DES SYMBOLES ////////
-			if(est_present("-s", argc, argv) != 0){
 				printf("\n\t\t\t[ Affichage des symboles ]\n\n");
 				aff_Symtable(file);
-			}
-
-
-			////////// AFFICHAGE DE LA SECTION DONNEE//////////
-			num_section = est_present("-x", argc, argv);
-			if(num_section != 0){
-				if(num_section+1<argc-1){
-					printf("\n\t\t\t[ Affichage de la section %s ]\n\n", argv[num_section+1]);
-					if(isnumber(argv[num_section+1])){
-						aff_section(file, "", atoi(argv[num_section+1]));
-					} else {
-						aff_section(file, argv[num_section+1], 1);
-					}
-				} else {
-					printf("[main.c] Error invalid section name\n");
-				}
-			}
-
-			if(est_present("-r", argc, argv)){
 				printf("\n\t\t\t[ Affichage des relocations ]\n\n");
 				aff_Reloc(file); 
-			}
+			} else {
 
-			
+
+				//////////// AFFICHAGE HEADER /////////
+				if(est_present("-h", argc, argv) != 0){
+					printf("\n\t\t\t[ Affichage du header ]\n\n");
+					aff_header(file);
+				}
+
+				/////// AFFICHAGE SECTION HEADER ////
+				if(est_present("-S", argc, argv) != 0){
+					printf("\n\t\t\t[ Affichage des sections header ]\n\n");
+					aff_Sheader(file);
+				}
+
+				//////////// AFFICHAGE DES SYMBOLES ////////
+				if(est_present("-s", argc, argv) != 0){
+					printf("\n\t\t\t[ Affichage des symboles ]\n\n");
+					aff_Symtable(file);
+				}
+
+
+				////////// AFFICHAGE DE LA SECTION DONNEE//////////
+				num_section = est_present("-x", argc, argv);
+				if(num_section != 0){
+					if(num_section+1<argc-1){
+						printf("\n\t\t\t[ Affichage de la section %s ]\n\n", argv[num_section+1]);
+						if(isnumber(argv[num_section+1])){
+							aff_section(file, "", atoi(argv[num_section+1]));
+						} else {
+							aff_section(file, argv[num_section+1], 1);
+						}
+					} else {
+						printf("[main.c] Error invalid section name\n");
+					}
+				}
+
+				if(est_present("-r", argc, argv)){
+					printf("\n\t\t\t[ Affichage des relocations ]\n\n");
+					aff_Reloc(file); 
+				}
+
+				
+			}
+			free(file.header);
+			free(file.shtab);
+			free(file.symtab);
+			for(int i=0;i<nbIndSectionReltab(file);i++){
+				free(file.tabrel[i].reltab);
+			}
+			free(file.tabrel);
+		} else {
+			printf("Erreur de lecture fichiers\n");
+			return 1;
 		}
-		free(file.header);
-		free(file.shtab);
-		free(file.symtab);
-		for(int i=0;i<nbIndSectionReltab(file);i++){
-			free(file.tabrel[i].reltab);
-		}
-		free(file.tabrel);
 	}
 
 
