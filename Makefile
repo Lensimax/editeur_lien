@@ -25,4 +25,4 @@ testfus.o : filereader.h elfheader.h elfsectiontab.h elfsection.h elfsymbtab.h e
 fusion.o: elfreloc.h filereader.h elfheader.h elfsectiontab.h elfsection.h elfsymbtab.h sectionfus.h
 
 clean:
-	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o fill_struct.o lecture
+	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o testfus.o fusion.o fill_struct.o lecture fusion 
