@@ -15,15 +15,15 @@ const char* Reloc_Type[] =
 		"R_ARM_THM_MOVT_PREL", "", "", "", "", "" 
 	};
 	
-int IsIndSectionReltab(Elf32_Ehdr * header,Elf32_Shdr* shtab, int i) {
-	return shtab[i].sh_type == SHT_REL;
+int IsIndSectionReltab(ELF_STRUCT file, int i) {
+	return file.shtab[i].sh_type == SHT_REL;
 }
 
 
-int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
+int nbIndSectionReltab(ELF_STRUCT file) {
 	int sum = 0;
-	for(int i=0;i<header->e_shnum;i++){
-		if (Shtab[i].sh_type == SHT_REL) {
+	for(int i=0;i<file.header->e_shnum;i++){
+		if (file.shtab[i].sh_type == SHT_REL) {
 			sum++;
 		}
 	}
@@ -32,7 +32,7 @@ int nbIndSectionReltab(Elf32_Ehdr * header, Elf32_Shdr * Shtab) {
 
 
 
-int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf32_Sym * Symtab, char * filePath) {
+int readReloc(ELF_STRUCT file) {
   
 	int j, n;
 	FILE *f;
@@ -45,23 +45,25 @@ int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf3
 	///// A CHANGER /////
 
 	n = 0;
-	for (int i=0; i<header->e_shnum; i++) {
-          if (IsIndSectionReltab(header, Shtab, i)) {
-			f = fopen(filePath, "r");
+	for (int i=0; i<file.header->e_shnum; i++) {
+          if (IsIndSectionReltab(file, i)) {
+			f = fopen(file.file_name, "r");
+
 			if(f != NULL){
-				fseek(f, Shtab[i].sh_offset, SEEK_SET);
-				Reltab[n] = malloc(sizeof(Elf32_Rel)*(Shtab[i].sh_size/Shtab[i].sh_entsize));
-				for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
-					fread(&Reltab[n][j], sizeof(Elf32_Rel), 1, f);
+
+				fseek(f, file.shtab[i].sh_offset, SEEK_SET);
+				file.Reltab[n] = malloc(sizeof(Elf32_Rel)*(file.shtab[i].sh_size/file.shtab[i].sh_entsize));
+				for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
+					fread(&file.Reltab[n][j], sizeof(Elf32_Rel), 1, f);
 				}		
 				fclose(f);
 				
-				if((header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
+				if((file.header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((file.header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
 			
 			
-					for (j=0; j<Shtab[i].sh_size/Shtab[i].sh_entsize; j++){
-						Reltab[n][j].r_offset = reverse_4(Reltab[n][j].r_offset);
-						Reltab[n][j].r_info = reverse_4(Reltab[n][j].r_info);				
+					for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
+						file.Reltab[n][j].r_offset = reverse_4(file.Reltab[n][j].r_offset);
+						file.Reltab[n][j].r_info = reverse_4(file.Reltab[n][j].r_info);				
 					}
 				}
 			} else {
@@ -78,16 +80,34 @@ int readReloc(Elf32_Rel ** Reltab, Elf32_Ehdr * header, Elf32_Shdr * Shtab, Elf3
 }
 
 void aff_Reloc(ELF_STRUCT file){
-	char *name;
-
+	char *name, *name_symb;
+	int n=0, m, l;
 	for (int i=0; i<file.header->e_shnum; i++) {
 
-		name = nom_section(file, i);
+		if (IsIndSectionReltab(file, i)){
 
-		printf("Section de réadressage %d : %s\n",i, name);
-		
-		printf("[*] Offset : %x\n",file.Reltab[i].r_offset); // Sûrement faux
-		printf("[*] Type : %s\n", Reloc_Type[ELF32_R_TYPE(file.Reltab[i].r_info)]);
-		printf("[*] Symbol Index : %x\n", ELF32_R_SYM(file.Reltab[i].r_info));
+			name = nom_section(file, i);
+
+			printf("Section de réadressage %d : %s\n",i, name);
+
+			printf("Décalage |   Info   |     Type     | Val.-sym | Noms-symboles\n");
+
+			for (int j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){	
+	
+					name_symb = malloc(sizeof(char)*75);
+					m = 0;
+					l = file.shtab[file.header->e_shstrndx].sh_offset + file.shtab[file.symtab[ELF32_R_SYM(file.Reltab[n][j].r_info)].st_shndx].sh_name;
+					while (file.fileBytes[l] != 0)
+					{
+						name_symb[m] = file.fileBytes[l];
+						l++;
+						m++;
+					}
+					name_symb[m]=0;
+					printf("%08x | %08x | %-12s | %08x | %s \n",file.Reltab[n][j].r_offset,file.Reltab[n][j].r_info,Reloc_Type[ELF32_R_TYPE(file.Reltab[n][j].r_info)],file.symtab[ELF32_R_SYM(file.Reltab[n][j].r_info)].st_value,name_symb);
+			}
+			printf("\n");			
+			n++;
+		}
 	}
 }

@@ -35,6 +35,7 @@ void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 		if(!(section_index > file.header->e_shnum)){
 			section = file.shtab[section_index];
 			name = nom_section(file, section_index);
+			printf("Nom section %s\n", name);
 		}
 		else {
 			printf("Veuillez choisir un numéro de section valable\n");
