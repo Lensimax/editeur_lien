@@ -1,3 +1,6 @@
+#ifndef _____SECT_FUS____
+#define _____SECT_FUS____
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <elf.h>
@@ -11,3 +14,5 @@ typedef struct {
 } sect_tab;
 
 int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT fileres, sect_tab * tab);
+
+#endif
