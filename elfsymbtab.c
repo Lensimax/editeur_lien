@@ -30,7 +30,6 @@ int readSymbtab(ELF_STRUCT file){
 	FILE *f;
 
 	//ouverture du fichier filePath
-	//printf("dans section tab %s\n", file.file_name);
 	f = fopen(file.file_name, "r");
 
 	//si l'ouverture a reussi
@@ -42,8 +41,11 @@ int readSymbtab(ELF_STRUCT file){
 		//on cherche le nombre de symboles (taille de la section/taille d'un symbole)
 		for (j=0; j<file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize; j++){
 
-			fread(&file.symtab[j], file.shtab[file.indice_symtab].sh_entsize, 1, f);
-
+			fread(&file.symtab[j].symbole, file.shtab[file.indice_symtab].sh_entsize, 1, f);
+			file.symtab[j].old_num=j;
+			file.symtab[j].fusion_num_f1=0;
+			file.symtab[j].fusion_num_f2=0;
+			file.symtab[j].new_num=0;
 		}
 		//fermeture du fichier
 		fclose(f);
@@ -54,10 +56,10 @@ int readSymbtab(ELF_STRUCT file){
 
 			for (j=0; j<file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize; j++){
 
-				file.symtab[j].st_name = reverse_4(file.symtab[j].st_name);
-				file.symtab[j].st_value = reverse_4(file.symtab[j].st_value);
-				file.symtab[j].st_size = reverse_4(file.symtab[j].st_size);
-				file.symtab[j].st_shndx = reverse_2(file.symtab[j].st_shndx);
+				file.symtab[j].symbole.st_name = reverse_4(file.symtab[j].symbole.st_name);
+				file.symtab[j].symbole.st_value = reverse_4(file.symtab[j].symbole.st_value);
+				file.symtab[j].symbole.st_size = reverse_4(file.symtab[j].symbole.st_size);
+				file.symtab[j].symbole.st_shndx = reverse_2(file.symtab[j].symbole.st_shndx);
 						
 			
 			}
@@ -96,15 +98,15 @@ void aff_Symtable(ELF_STRUCT file){
 		printf("   %4d:",numSymb);
 		numSymb++;
 
-		printf(" |  %08x",file.symtab[j].st_value);
+		printf(" |  %08x",file.symtab[j].symbole.st_value);
 
-		printf("  |   %4d",file.symtab[j].st_size);
+		printf("  |   %4d",file.symtab[j].symbole.st_size);
 
 		printf("   | ");
 
 		//recuperation du bind et du type contenu dans st_info
-		bind = ELF32_ST_BIND(file.symtab[j].st_info);
-		type = ELF32_ST_TYPE(file.symtab[j].st_info);
+		bind = ELF32_ST_BIND(file.symtab[j].symbole.st_info);
+		type = ELF32_ST_TYPE(file.symtab[j].symbole.st_info);
 
 		//affichage du type
 		switch(type){
@@ -144,7 +146,7 @@ void aff_Symtable(ELF_STRUCT file){
 		printf(" |\t");
 
 		//affichage de l'index
-		switch(file.symtab[j].st_shndx){
+		switch(file.symtab[j].symbole.st_shndx){
 			      case SHN_UNDEF:
 				printf("UND");
 				break;
@@ -152,7 +154,7 @@ void aff_Symtable(ELF_STRUCT file){
 				printf("ABS");
 				break;
 			      default:
-				printf("%3d",file.symtab[j].st_shndx);
+				printf("%3d",file.symtab[j].symbole.st_shndx);
 				break;
 		}
 
@@ -168,7 +170,7 @@ void aff_Symtable(ELF_STRUCT file){
 		//on suppose le nom d'un symbole inferieur a 75 char
 		nameString = malloc(sizeof(char)*75);
 		//position en debut de nom du symbole
-		addrStrName = addrStrName+file.symtab[j].st_name;
+		addrStrName = addrStrName+file.symtab[j].symbole.st_name;
 		i = 0;
 			//recuperation du symbole
 		    while(file.fileBytes[addrStrName] != '\0'){
