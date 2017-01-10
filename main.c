@@ -61,7 +61,7 @@ int main(int argc, char* argv[]){
 				if(readSymbtab(file)){
 					printf("Lecture symbole tab done!\n"); // DEBUG
 
-					file.Reltab = malloc(sizeof(Elf32_Rel*)*(nbIndSectionReltab(file)));
+					file.tabrel = malloc(sizeof(STRUCT_REL)*(nbIndSectionReltab(file)));
 
 					if(readReloc(file)){
 						printf("Lecture reloc done!\n"); // DEBUG
@@ -151,9 +151,9 @@ int main(int argc, char* argv[]){
 		free(file.shtab);
 		free(file.symtab);
 		for(int i=0;i<nbIndSectionReltab(file);i++){
-			free(file.Reltab[i]);
+			free(file.tabrel[i].Reltab);
 		}
-		free(file.Reltab);
+		free(file.tabrel);
 	}
 
 

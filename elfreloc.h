@@ -12,4 +12,5 @@
 int nbIndSectionReltab(ELF_STRUCT file);
 int readReloc(ELF_STRUCT file);
 void aff_Reloc(ELF_STRUCT file);
+int IsIndSectionReltab(ELF_STRUCT file, int i);
 

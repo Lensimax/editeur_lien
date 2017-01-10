@@ -15,5 +15,7 @@ Jour 4 (vendredi)
 Jour 5 (lundi)
 	- fais le main (avec les options)
 	- reflexion sur la fusion
-
+Jour 6
+	- ajout d'une structure pour les reloc
+	- creation d'un main de fusion
 

@@ -36,13 +36,6 @@ int readReloc(ELF_STRUCT file) {
   
 	int j, n;
 	FILE *f;
-  
-	// PARTIE REL
-
-	/* c'est un peu porc */
-
-
-	///// A CHANGER /////
 
 	n = 0;
 	for (int i=0; i<file.header->e_shnum; i++) {
@@ -52,9 +45,10 @@ int readReloc(ELF_STRUCT file) {
 			if(f != NULL){
 
 				fseek(f, file.shtab[i].sh_offset, SEEK_SET);
-				file.Reltab[n] = malloc(sizeof(Elf32_Rel)*(file.shtab[i].sh_size/file.shtab[i].sh_entsize));
+				file.tabrel[n].Reltab = malloc(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize);
+
 				for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
-					fread(&file.Reltab[n][j], sizeof(Elf32_Rel), 1, f);
+					fread(&file.tabrel[n].Reltab[j], sizeof(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize), 1, f);
 				}		
 				fclose(f);
 				
@@ -62,10 +56,12 @@ int readReloc(ELF_STRUCT file) {
 			
 			
 					for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
-						file.Reltab[n][j].r_offset = reverse_4(file.Reltab[n][j].r_offset);
-						file.Reltab[n][j].r_info = reverse_4(file.Reltab[n][j].r_info);				
+						file.tabrel[n].Reltab[j].r_offset = reverse_4(file.tabrel[n].Reltab[j].r_offset);
+						file.tabrel[n].Reltab[j].r_info = reverse_4(file.tabrel[n].Reltab[j].r_info);				
 					}
 				}
+				file.tabrel[n].indice_section = i;
+
 			} else {
 				printf("Probleme ouverture fichier(table reloc)\n");
 				return 0;
@@ -88,15 +84,15 @@ void aff_Reloc(ELF_STRUCT file){
 
 			name = nom_section(file, i);
 
-			printf("Section de réadressage %d : %s\n",i, name);
+			printf("Section de réadressage %d : %s\n",file.tabrel[n].indice_section, name);
 
-			printf("Décalage |   Info   |     Type     | Val.-sym | Noms-symboles\n");
+			printf("Décalage |   Info   | %-16s | Val.-sym | Noms-symboles\n", "    Type    ");
 
 			for (int j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){	
 	
 					name_symb = malloc(sizeof(char)*75);
 					m = 0;
-					l = file.shtab[file.header->e_shstrndx].sh_offset + file.shtab[file.symtab[ELF32_R_SYM(file.Reltab[n][j].r_info)].st_shndx].sh_name;
+					l = file.shtab[file.header->e_shstrndx].sh_offset + file.shtab[file.symtab[ELF32_R_SYM(file.tabrel[n].Reltab[j].r_info)].st_shndx].sh_name;
 					while (file.fileBytes[l] != 0)
 					{
 						name_symb[m] = file.fileBytes[l];
@@ -104,7 +100,7 @@ void aff_Reloc(ELF_STRUCT file){
 						m++;
 					}
 					name_symb[m]=0;
-					printf("%08x | %08x | %-12s | %08x | %s \n",file.Reltab[n][j].r_offset,file.Reltab[n][j].r_info,Reloc_Type[ELF32_R_TYPE(file.Reltab[n][j].r_info)],file.symtab[ELF32_R_SYM(file.Reltab[n][j].r_info)].st_value,name_symb);
+					printf("%08x | %08x | %-16s | %08x | %s \n",file.tabrel[n].Reltab[j].r_offset,file.tabrel[n].Reltab[j].r_info,Reloc_Type[ELF32_R_TYPE(file.tabrel[n].Reltab[j].r_info)],file.symtab[ELF32_R_SYM(file.tabrel[n].Reltab[j].r_info)].st_value,name_symb);
 			}
 			printf("\n");			
 			n++;
