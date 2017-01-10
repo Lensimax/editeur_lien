@@ -10,4 +10,4 @@ typedef struct {
 	int type, offset1, size1, offset2, size2, newnum, numorigin;
 } sect_tab;
 
-int sectfusion (Elf32_Ehdr * header1, Elf32_Shdr * shtab1, const char *filepath1, Elf32_Ehdr * header2, Elf32_Shdr * shtab2, const char *filepath2,Elf32_Shdr * shres, sect_tab * tab);
+int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT fileres, sect_tab * tab);
