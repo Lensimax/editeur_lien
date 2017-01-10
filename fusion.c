@@ -99,11 +99,11 @@ void fusion(Elf32_Ehdr * header,Elf32_Shdr * shtab, sect_tab * tab, int nbtab,ch
 	///////affichage des sections///////
 	for (int i=0; i<nbtab;i++){
 
-		text1=realloc(text1, ((tab[i].size1)*sizeof(char)));
+		text1=malloc(((tab[i].size1)*sizeof(char)));
 		fseek(file1,tab[i].offset1,SEEK_SET);
 		fread(text1, 1, tab[i].size1 , file1);	
 
-		text2=realloc(text2, ((tab[i].size2)*sizeof(char)));
+		text2=malloc(((tab[i].size2)*sizeof(char)));
 		fseek(file2,tab[i].offset2,SEEK_SET);
 		fread(text2, 1, tab[i].size2 , file2);
 
@@ -113,6 +113,8 @@ void fusion(Elf32_Ehdr * header,Elf32_Shdr * shtab, sect_tab * tab, int nbtab,ch
 		for (int i=0; i<tab[i].size2; i++){
 			affichebin1(text2[i]);
 		}
+		free(text1);
+		free(text2);
 
 	}
 
