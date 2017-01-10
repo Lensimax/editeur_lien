@@ -17,5 +17,6 @@ Jour 5 (lundi)
 	- reflexion sur la fusion
 Jour 6
 	- ajout d'une structure pour les reloc
+	- ajout d'une structure pour les symboles
 	- creation d'un main de fusion
 

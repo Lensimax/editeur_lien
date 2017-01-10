@@ -55,8 +55,9 @@ int main(int argc, char* argv[]){
 				printf("Lecture sections header done!\n"); // DEBUG
 
 				file.indice_symtab = getIndSectionSymtab(file.header,file.shtab);
-				file.symtab = malloc(sizeof(Elf32_Sym)*(file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize));
-
+				file.symtab = malloc(sizeof(STRUCT_SYM)*(file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize));
+				// file.symtab.symbole = malloc(sizeof(Elf32_Sym));
+				
 				//printf("%s main avant\n", file.file_name);
 				if(readSymbtab(file)){
 					printf("Lecture symbole tab done!\n"); // DEBUG
@@ -151,7 +152,7 @@ int main(int argc, char* argv[]){
 		free(file.shtab);
 		free(file.symtab);
 		for(int i=0;i<nbIndSectionReltab(file);i++){
-			free(file.tabrel[i].Reltab);
+			free(file.tabrel[i].reltab);
 		}
 		free(file.tabrel);
 	}

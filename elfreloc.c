@@ -45,10 +45,10 @@ int readReloc(ELF_STRUCT file) {
 			if(f != NULL){
 
 				fseek(f, file.shtab[i].sh_offset, SEEK_SET);
-				file.tabrel[n].Reltab = malloc(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize);
+				file.tabrel[n].reltab = malloc(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize);
 
 				for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
-					fread(&file.tabrel[n].Reltab[j], sizeof(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize), 1, f);
+					fread(&file.tabrel[n].reltab[j], sizeof(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize), 1, f);
 				}		
 				fclose(f);
 				
@@ -56,8 +56,8 @@ int readReloc(ELF_STRUCT file) {
 			
 			
 					for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
-						file.tabrel[n].Reltab[j].r_offset = reverse_4(file.tabrel[n].Reltab[j].r_offset);
-						file.tabrel[n].Reltab[j].r_info = reverse_4(file.tabrel[n].Reltab[j].r_info);				
+						file.tabrel[n].reltab[j].r_offset = reverse_4(file.tabrel[n].reltab[j].r_offset);
+						file.tabrel[n].reltab[j].r_info = reverse_4(file.tabrel[n].reltab[j].r_info);				
 					}
 				}
 				file.tabrel[n].indice_section = i;
@@ -92,7 +92,7 @@ void aff_Reloc(ELF_STRUCT file){
 	
 					name_symb = malloc(sizeof(char)*75);
 					m = 0;
-					l = file.shtab[file.header->e_shstrndx].sh_offset + file.shtab[file.symtab[ELF32_R_SYM(file.tabrel[n].Reltab[j].r_info)].st_shndx].sh_name;
+					l = file.shtab[file.header->e_shstrndx].sh_offset + file.shtab[file.symtab[ELF32_R_SYM(file.tabrel[n].reltab[j].r_info)].symbole.st_shndx].sh_name;
 					while (file.fileBytes[l] != 0)
 					{
 						name_symb[m] = file.fileBytes[l];
@@ -100,7 +100,7 @@ void aff_Reloc(ELF_STRUCT file){
 						m++;
 					}
 					name_symb[m]=0;
-					printf("%08x | %08x | %-16s | %08x | %s \n",file.tabrel[n].Reltab[j].r_offset,file.tabrel[n].Reltab[j].r_info,Reloc_Type[ELF32_R_TYPE(file.tabrel[n].Reltab[j].r_info)],file.symtab[ELF32_R_SYM(file.tabrel[n].Reltab[j].r_info)].st_value,name_symb);
+					printf("%08x | %08x | %-16s | %08x | %s \n",file.tabrel[n].reltab[j].r_offset,file.tabrel[n].reltab[j].r_info,Reloc_Type[ELF32_R_TYPE(file.tabrel[n].reltab[j].r_info)],file.symtab[ELF32_R_SYM(file.tabrel[n].reltab[j].r_info)].symbole.st_value,name_symb);
 			}
 			printf("\n");			
 			n++;
