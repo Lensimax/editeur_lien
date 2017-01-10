@@ -20,7 +20,7 @@ int main(int argc, char * argv[]){
 
 	ELF_STRUCT file1;
 	ELF_STRUCT file2;
-	ELF_STRUCT res;
+	//ELF_STRUCT res;
 
 	FILE *fich;
 
@@ -35,11 +35,11 @@ int main(int argc, char * argv[]){
 
 
 
-				int nbtab = sectfusion( file1, file2, res , tab);
+				/*int nbtab = sectfusion( file1, file2, res , tab);
 				file1.header->e_shnum = nbtab;
 
 				res.file=file1.file;
-				res.header->e_shnum=nbtab;
+				res.header->e_shnum=nbtab;*/
 
 
 
