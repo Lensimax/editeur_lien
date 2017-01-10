@@ -122,5 +122,6 @@ void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 	} 
 	printf("\n");
 
+	free(name);
 
 }

@@ -30,6 +30,7 @@ int readSymbtab(ELF_STRUCT file){
 	FILE *f;
 
 	//ouverture du fichier filePath
+	//printf("dans section tab %s\n", file.file_name);
 	f = fopen(file.file_name, "r");
 
 	//si l'ouverture a reussi
