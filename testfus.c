@@ -13,63 +13,51 @@
 #include "fusion.h"
 //#include "sectionfus.h"
 #include "filereader.h"
+#include "fill_struct.h"
 
 
 int main(int argc, char * argv[]){
 
 	ELF_STRUCT file1;
 	ELF_STRUCT file2;
-	ELF_STRUCT res;	
-	
+	ELF_STRUCT res;
 
-	strcpy(file1.file_name,"ARM.o");
-	strcpy(file2.file_name,"example2.o");
+	FILE *fich;
 
-	file1.fileBytes = readFileBytes("ARM.o");
-	file2.fileBytes = readFileBytes("example2.o");
+	if(argc == 1 || argc == 2 || argc == 3){
+		printf("\nEntrer au moins trois fichiers en argument le dernier etant le fichier resultat!!!!!!\n\n");
+	} else {
 
-	strcpy(res.file_name,"ARM.o");
-	res.fileBytes = readFileBytes("ARM.o");
-	
-	
-	
-		
+		fich = fopen(argv[argc+1], "w");
 
-
-	res.shtab = malloc(sizeof(Elf32_Shdr));
-	sect_tab * tab = malloc(sizeof(sect_tab));
-
-	file1.header = malloc(sizeof(Elf32_Ehdr));
-	file2.header = malloc(sizeof(Elf32_Ehdr));	
-	res.header = malloc(sizeof(Elf32_Ehdr));
-
-	
-	
-	if(readHeader(file1)&&readHeader(file2)){
-
-	
-
-	file1.shtab = malloc(sizeof(Elf32_Shdr)*file1.header->e_shnum);
-	readSectTab(file1);
-	file2.shtab = malloc(sizeof(Elf32_Shdr)*file2.header->e_shnum);
-	readSectTab(file2);
+		if(fich){
+			if(fill(&file1, argv[1]) && fill(&file2, argv[2])){
 
 
 
-	int nbtab = sectfusion( file1, file2, res , tab);
-	
-	aff_header(file1);
-	aff_header(file2);
-	file1.header->e_shnum = nbtab;
-	
-		
-	//fusion( file1.header, res.shtab, tab, nbtab, file1.file_name,  file2.file_name);
-	
-	res.file=file1.file;
-	res.header->e_shnum=nbtab;
-	//aff_Sheader(res);
-	
+				int nbtab = sectfusion( file1, file2, res , tab);
+				file1.header->e_shnum = nbtab;
+
+				res.file=file1.file;
+				res.header->e_shnum=nbtab;
+
+
+
+
+			} else {
+				printf("[E] Erreur lors du remplissage \n");
+			}
+			
+		} else {
+			printf("Erreur d\'ouverture du fichier resultat : %s\n", argv[3]);
+		}
+
+		fclose(fich);
 	}
+
+
+	
+	
 
 
 }
