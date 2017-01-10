@@ -14,40 +14,38 @@ int readHeader(ELF_STRUCT file){
 		//on rempli le header
 		fread(file.header, sizeof(Elf32_Ehdr), 1, f);	
 		//fermeture du fichier
-		fclose(f);	
 	//si l'ouverture echoue		
 	} else {				
 		//message d'erreur
 		printf("Probleme ouverture fichier (header)\n");
 		return 0;
 	}
+	fclose(f);	
 
 	//si on a le chiffre magique suivit de ELF(=fichier ELF)
 	if(file.header->e_ident[EI_MAG0] == 127 && file.header->e_ident[EI_MAG1] == 69 && file.header->e_ident[EI_MAG2] == 76 && file.header->e_ident[EI_MAG3] == 70){
 
 		//inversion des octets si on a un problème de boutisme	
 		if((file.header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((file.header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
-		file.header->e_type = reverse_2(file.header->e_type);
-		file.header->e_machine = reverse_2(file.header->e_machine);
-		file.header->e_version = reverse_4(file.header->e_version);
-		file.header->e_entry = reverse_4(file.header->e_entry);
-		file.header->e_phoff = reverse_4(file.header->e_phoff);
-		file.header->e_shoff = reverse_4(file.header->e_shoff);
-		file.header->e_flags = reverse_4(file.header->e_flags);
-		file.header->e_ehsize = reverse_2(file.header->e_ehsize);
-		file.header->e_phentsize = reverse_2(file.header->e_phentsize);
-		file.header->e_phnum = reverse_2(file.header->e_phnum);
-		file.header->e_shentsize = reverse_2(file.header->e_shentsize);
-		file.header->e_shnum = reverse_2(file.header->e_shnum);
-		file.header->e_shstrndx = reverse_2(file.header->e_shstrndx);
+			file.header->e_type = reverse_2(file.header->e_type);
+			file.header->e_machine = reverse_2(file.header->e_machine);
+			file.header->e_version = reverse_4(file.header->e_version);
+			file.header->e_entry = reverse_4(file.header->e_entry);
+			file.header->e_phoff = reverse_4(file.header->e_phoff);
+			file.header->e_shoff = reverse_4(file.header->e_shoff);
+			file.header->e_flags = reverse_4(file.header->e_flags);
+			file.header->e_ehsize = reverse_2(file.header->e_ehsize);
+			file.header->e_phentsize = reverse_2(file.header->e_phentsize);
+			file.header->e_phnum = reverse_2(file.header->e_phnum);
+			file.header->e_shentsize = reverse_2(file.header->e_shentsize);
+			file.header->e_shnum = reverse_2(file.header->e_shnum);
+			file.header->e_shstrndx = reverse_2(file.header->e_shstrndx);
 		}
 		return 1;
 	//si on est pas dans un fichier ELF
 	} else {	
 		return 0;
 	}
-
-	
 
 }
 

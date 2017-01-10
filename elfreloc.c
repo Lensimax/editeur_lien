@@ -50,7 +50,6 @@ int readReloc(ELF_STRUCT file) {
 				for (j=0; j<file.shtab[i].sh_size/file.shtab[i].sh_entsize; j++){
 					fread(&file.tabrel[n].reltab[j], sizeof(sizeof(Elf32_Rel)*file.shtab[i].sh_size/file.shtab[i].sh_entsize), 1, f);
 				}		
-				fclose(f);
 				
 				if((file.header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((file.header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
 			
@@ -67,6 +66,7 @@ int readReloc(ELF_STRUCT file) {
 				return 0;
 			}			
 
+			fclose(f);
 			n++;
 		}
 	}

@@ -56,9 +56,8 @@ int main(int argc, char* argv[]){
 
 				file.indice_symtab = getIndSectionSymtab(file.header,file.shtab);
 				file.symtab = malloc(sizeof(STRUCT_SYM)*(file.shtab[file.indice_symtab].sh_size/file.shtab[file.indice_symtab].sh_entsize));
-				// file.symtab.symbole = malloc(sizeof(Elf32_Sym));
 				
-				//printf("%s main avant\n", file.file_name);
+				
 				if(readSymbtab(file)){
 					printf("Lecture symbole tab done!\n"); // DEBUG
 

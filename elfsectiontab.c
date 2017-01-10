@@ -19,7 +19,6 @@ int readSectTab(ELF_STRUCT file){
 			fread(&file.shtab[j], sizeof(Elf32_Shdr), 1, f);
 		}	
 		//fermeture du fichier	
-		fclose(f);
 	
 		//inversion des octets si on a un problème de boutisme pour charque section
 		if((file.header->e_ident[EI_DATA] == 1 && is_big_endian()) || ((file.header->e_ident[EI_DATA] == 2) && !is_big_endian())) {
@@ -45,14 +44,15 @@ int readSectTab(ELF_STRUCT file){
 
 	//si l'ouverture a echoue
 	} else {
+		fclose(f);
 		//affichage message d'erreur
 		printf("Probleme ouverture fichier(table section)\n");
 		return 0;
 	}
 
-
-		return 1;
-	}
+	fclose(f);
+	return 1;
+}
 
 
 
