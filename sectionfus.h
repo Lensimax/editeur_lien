@@ -10,7 +10,9 @@
 
 typedef struct {
 	char name[256];
-	int type, offset1, size1, offset2, size2, newnum, numorigin;
+	int offset1, size1, offset2, size2;
+	int newnum, numorigin;
+	int type, fusion, offset;
 } sect_tab;
 
 int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT fileres, sect_tab * tab);
