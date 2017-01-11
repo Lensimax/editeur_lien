@@ -8,6 +8,9 @@ void change_num_after_fusion(sect_tab * sect_fus, STRUCT_SYM * symbol, int nb_se
 		if(sect_fus[i].numorigin == symbol->symbole.st_shndx) {
 			if(sect_fus[i].numorigin != sect_fus[i].newnum) {
 				symbol->symbole.st_shndx=sect_fus[i].newnum;
+				if(sect_fus[i].fusion == 1) {
+				symbol->symbole.st_value+=sect_fus[i].size1;
+				}
 			}
 		}
 	}
@@ -23,9 +26,12 @@ void ajout_symbole_symtable_finale(int * compteur_symtab, STRUCT_SYM * symtab_fi
 }
 
 
+
+
+
 //CORPS
 
-int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, sect_tab * sect_fus, ELF_STRUCT * file_final, int nb_sect_after_fusion, int * resultat_nb_symboles){ /////// malloc du symtab_final à faire dans le main (malloc de 1)
+int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sect_tab * sect_fus, int nb_sect_after_fusion){ /////// malloc du symtab_final à faire dans le main (malloc de 1)
 
 
 	int compteur_symtab_final = 0;
@@ -223,18 +229,15 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, sect_tab * sect_fus, ELF_STR
 
 *resultat_nb_symboles = compteur_symtab_final;
 
-return compteur_locaux_fichier;
+	file_final->shtab[getIndSectionSymtab(file_final->header,file_final->shtab)].sh_size = compteur_symtab_final*file_final->shtab[getIndSectionSymtab(file_final->header,file_final->shtab)].sh_entsize;
+	for(int i = getIndSectionSymtab(file_final->header,file_final->shtab); i<file_final->header->e_shnum;i++){
+		file_final->shtab[i].sh_offset -= ((file_1.shtab[getIndSectionSymtab(file_1.header,file_1.shtab)].sh_size + file_2.shtab[getIndSectionSymtab(file_2.header,file_2.shtab)].sh_size) - compteur_symtab_final);
+	}
+
+
+//return compteur_locaux_fichier;
+
+
 
 }
-
-
-
-
-
-
-
-
-
-
-
 

@@ -23,7 +23,7 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 			for(int j=0; j<file_2.header->e_shnum; j++) {
 				if (IsIndSectionReltab(file_2, j)) {
 					
-					if(!strcmp(nom_section(file_1,i),nom_section(file_2,j))) {
+					if(!strcmp(nom_section(file_1,i),nom_section(file_2,j))) { /////FUSION A FAIRE
 						
 						for(int x=0;x<nbIndSectionReltab(file_1);x++){
 							if(file_1.tabrel[x].indice_section == i) {
@@ -42,19 +42,19 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 								for(int n=0; n<file_2.shtab[j].sh_size/file_2.shtab[j].sh_entsize; n++) {
 									file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section] = file_2.tabrel[x].reltab[n];
 									correction_num_symb_reloc(file_final,&file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section]);
+									file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section].r_offset+=file_1.shtab[i].sh_size;
 									compteur_rel_par_section++;
 								}
 							}
 						}
 					a_trouve_rel_meme_nom = 1;
 					compteur_rel_par_section = 0;
-					////////////////////////////// TROUVER UN MOYEN DE REMPLIR INDICE_SECTION DANS TABREL_FINAL
 					compteur_section_rel_final++;
 					}
 				}
 			}
 			
-			if(!a_trouve_rel_meme_nom) {
+			if(!a_trouve_rel_meme_nom) {		/////PAS DE FUSION A FAIRE
 				for(int x=0;x<nbIndSectionReltab(file_1);x++){
 					if(file_1.tabrel[x].indice_section == i) {
 						for(int n=0; n<file_1.shtab[i].sh_size/file_1.shtab[i].sh_entsize; n++) {
@@ -85,7 +85,7 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 				}
 			}
 			
-			if(!a_trouve_rel_meme_nom) {
+			if(!a_trouve_rel_meme_nom) {	/////PAS DE FUSION A FAIRE
 				for(int x=0;x<nbIndSectionReltab(file_2);x++){
 					if(file_2.tabrel[x].indice_section == i) {
 						for(int n=0; n<file_2.shtab[i].sh_size/file_2.shtab[i].sh_entsize; n++) {
@@ -99,6 +99,8 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 			}
 		}
 	}
+
+	
 
 return 0;
 }
