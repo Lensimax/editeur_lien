@@ -96,7 +96,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 	//int length2  = file2.header->e_shnum;
 	
 
-
+	////HEADERS DE SECTIONS/////
 
 	for (int i  =  0; i < file1.header->e_shnum; i++){
 
@@ -215,12 +215,15 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 		}	
 	}
 
-//////HEADER
+//\\\\\HEADERS DE SECTIONS\\\\\
+
+
+//////HEADER///////
 fileres->header = file1.header;
 fileres->header->e_shoff = file1.header->e_ehsize;
 fileres->header->e_shnum = cpt;
 fileres->header->e_shstrndx = indice_strndx;
-//////
+//\\\\HEADER\\\\\\\
 
 return cpt;
 }

@@ -16,12 +16,13 @@ void change_num_after_fusion(sect_tab * sect_fus, STRUCT_SYM * symbol, int nb_se
 	}
 }
 
-void ajout_symbole_symtable_finale(int * compteur_symtab, STRUCT_SYM * symtab_final, Elf32_Sym symbol) {
+void ajout_symbole_symtable_finale(int * compteur_symtab, ELF_STRUCT * fileres, Elf32_Sym symbol) {
 
 	if (*compteur_symtab != 0){
-		symtab_final = realloc(symtab_final,sizeof(*symtab_final)+sizeof(Elf32_Sym)+4*(sizeof(int)));
+		fileres->symtab = realloc(fileres->symtab,sizeof(STRUCT_SYM)*(*compteur_symtab+1));		
 	}
-	symtab_final[*compteur_symtab].symbole=symbol;
+
+	fileres->symtab[*compteur_symtab].symbole = symbol;
 
 }
 
@@ -67,18 +68,17 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 ///////////////////////////////////PARCOURS DE LA 1ERE TABLE DE SYMBOLES
 	while(!ELF32_ST_BIND(file_1.symtab[p1].symbole.st_info) && p1 < (file_1.shtab[indice_symtab_1].sh_size/file_1.shtab[indice_symtab_1].sh_entsize)) {
 
-		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final->symtab, file_1.symtab[p1].symbole);
+		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_1.symtab[p1].symbole);
 		file_final->symtab[compteur_symtab_final].old_num = p1;
 		file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
 		p1++;
 		compteur_locaux_fichier++;
 		compteur_symtab_final++;
-		
 	}
 
 	while(!ELF32_ST_BIND(file_2.symtab[p2].symbole.st_info) && p2 < (file_2.shtab[indice_symtab_2].sh_size/file_2.shtab[indice_symtab_2].sh_entsize)) {
 
-		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final->symtab, file_2.symtab[p2].symbole);
+		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_2.symtab[p2].symbole);
 		
 		change_num_after_fusion(sect_fus, &file_final->symtab[compteur_symtab_final], nb_sect_after_fusion);
 		file_final->symtab[compteur_symtab_final].old_num = p2;
@@ -123,14 +123,14 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 				//ajout de la marque de fin
 				nameString_2[j] = 0;
 				
-				if(strcmp(nameString_1,nameString_2) == 0) {
+				if(strcmp(nameString_1,nameString_2) == 0 && nameString_1[0] != '\0') {
 					boolean = 1;
 					if(file_2.symtab[l].symbole.st_shndx != SHN_UNDEF && file_1.symtab[k].symbole.st_shndx != SHN_UNDEF) {
-						printf("ERREUR 2 SYMBOLES DEFINIS DE MEME NOMS");
-						return -1;
+						printf("\nERREUR 2 SYMBOLES DEFINIS DE MEME NOMS, IMPOSSIBLE DE FUSIONNER LES FICHIERS\n");
+						exit(1);
 
 					} else if((file_2.symtab[l].symbole.st_shndx == SHN_UNDEF && file_1.symtab[k].symbole.st_shndx != SHN_UNDEF) || (file_1.symtab[k].symbole.st_shndx == SHN_UNDEF && file_2.symtab[l].symbole.st_shndx == SHN_UNDEF)) {
-						ajout_symbole_symtable_finale(&compteur_symtab_final, file_final->symtab, file_1.symtab[k].symbole);
+						ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_1.symtab[k].symbole);
 						file_final->symtab[compteur_symtab_final].old_num = 0;
 						file_final->symtab[compteur_symtab_final].fusion_num_f1 = k;
 						file_final->symtab[compteur_symtab_final].fusion_num_f2 = l;
@@ -142,7 +142,7 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 			}
 			}
 			if(!boolean){																							//////SI LES 2 SYMBOLES N'ONT PAS LE MÊME NOM
-				ajout_symbole_symtable_finale(&compteur_symtab_final, file_final->symtab, file_1.symtab[k].symbole);
+				ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_1.symtab[k].symbole);
 				file_final->symtab[compteur_symtab_final].old_num = k;
 				file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
 				compteur_symtab_final++;
@@ -189,14 +189,14 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 				//ajout de la marque de fin
 				nameString_1[j] = 0;
 				
-				if(strcmp(nameString_2,nameString_1) == 0) {
+				if(strcmp(nameString_2,nameString_1) == 0 && nameString_1[0] != '\0') {
 					boolean = 1;
 					if(file_1.symtab[l].symbole.st_shndx != SHN_UNDEF && file_2.symtab[k].symbole.st_shndx != SHN_UNDEF) {
-						printf("ERREUR 2 SYMBOLES DEFINIS DE MEME NOMS");
-						return -1;
+						printf("\nERREUR 2 SYMBOLES DEFINIS DE MEME NOMS, IMPOSSIBLE DE FUSIONNER LES FICHIERS\n");
+						exit(1);
 					} else if(file_1.symtab[l].symbole.st_shndx == SHN_UNDEF && file_2.symtab[k].symbole.st_shndx != SHN_UNDEF) { // *var_1.st_shndx == SHN_UNDEF && *var_2.st_shndx != SHN_UNDEF
 
-						ajout_symbole_symtable_finale(&compteur_symtab_final, file_final->symtab, file_2.symtab[k].symbole);
+						ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_2.symtab[k].symbole);
 						file_final->symtab[compteur_symtab_final].old_num = 0;
 						file_final->symtab[compteur_symtab_final].fusion_num_f1 = l;
 						file_final->symtab[compteur_symtab_final].fusion_num_f2 = k;
@@ -213,7 +213,7 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 		
 			if(!boolean){																					//////SI LES 2 SYMBOLES N'ONT PAS LE MÊME NOM
 
-				ajout_symbole_symtable_finale(&compteur_symtab_final, file_final->symtab, file_2.symtab[k].symbole);
+				ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_2.symtab[k].symbole);
 				file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
 				file_final->symtab[compteur_symtab_final].old_num = k;
 				change_num_after_fusion(sect_fus, &file_final->symtab[compteur_symtab_final], nb_sect_after_fusion);
