@@ -14,13 +14,14 @@
 #include "sectionfus.h"
 #include "filereader.h"
 #include "fill_struct.h"
+#include "filewriter.h"
 
 
 int main(int argc, char * argv[]){
 
 	ELF_STRUCT file1;
 	ELF_STRUCT file2;
-	ELF_STRUCT res;
+	//ELF_STRUCT res;
 
 	FILE *fich;
 
@@ -34,13 +35,7 @@ int main(int argc, char * argv[]){
 			if(fill(&file1, argv[1]) && fill(&file2, argv[2])){
 
 
-
-				/*int nbtab = sectfusion( file1, file2, res , tab);
-				file1.header->e_shnum = nbtab;
-
-				res.file=file1.file;
-				res.header->e_shnum=nbtab;*/
-				res.file=fich;
+				/*res.file=fich;
 				strcpy(res.file_name,argv[argc-1]);
 				res.shtab = malloc(sizeof(Elf32_Shdr)*(file1.header->e_shnum+file2.header->e_shnum));
 				res.header = malloc(sizeof(Elf32_Ehdr));
@@ -60,7 +55,13 @@ int main(int argc, char * argv[]){
 				res.file=file1.file;
 				res.header->e_shnum=nbtab;
 				//aff_Sheader(res);
-				free(tab);
+				free(tab);*/
+
+				if(Write_file(file1, fich)){
+					printf("Ecriture faites\n");
+				} else {
+					printf("Ecriture echouée\n");
+				}
 
 
 
