@@ -15,13 +15,20 @@
 #include "filereader.h"
 #include "fill_struct.h"
 #include "filewriter.h"
+#include "symbolfus.h"
+#include "fusrel.h"
 
+
+void affichage_struct(ELF_STRUCT file);
 
 int main(int argc, char * argv[]){
 
 	ELF_STRUCT file1;
 	ELF_STRUCT file2;
-	//ELF_STRUCT res;
+	ELF_STRUCT res;
+	sect_tab *tab;
+
+	int nombre_section_apres_fusion;
 
 	FILE *fich;
 
@@ -34,36 +41,22 @@ int main(int argc, char * argv[]){
 		if(fich){
 			if(fill(&file1, argv[1]) && fill(&file2, argv[2])){
 
+				// affichage_struct(file1);
 
-				/*res.file=fich;
-				strcpy(res.file_name,argv[argc-1]);
-				res.shtab = malloc(sizeof(Elf32_Shdr)*(file1.header->e_shnum+file2.header->e_shnum));
-				res.header = malloc(sizeof(Elf32_Ehdr));
-
-
-				sect_tab *tab;
 				tab = malloc(sizeof(sect_tab));
-				int nbtab = sectfusion( file1, file2, res , tab);
-	
-				//aff_header(file1);
-				//aff_header(file2);
-				file1.header->e_shnum = nbtab;
-	
-		
-				//fusion( file1.header, res.shtab, tab, nbtab, file1.file_name,  file2.file_name);
-	
-				res.file=file1.file;
-				res.header->e_shnum=nbtab;
-				//aff_Sheader(res);
-				free(tab);*/
+				res.shtab = malloc(sizeof(Elf32_Shdr));
+				nombre_section_apres_fusion = sectfusion(file1, file2, &res, tab);
+				printf("Nombre section %d\n", nombre_section_apres_fusion);
+				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);
+				affichage_struct(res);
+				//relfus(file1, file2, &res);
 
-				if(Write_file(file1, fich)){
+
+				/*if(Write_file(file1, fich)){
 					printf("Ecriture faites\n");
 				} else {
 					printf("Ecriture echouée\n");
-				}
-
-
+				}*/
 
 
 			} else {
@@ -78,8 +71,22 @@ int main(int argc, char * argv[]){
 	}
 
 
-	
-	
 
 
+
+	return 0;
+
+
+}
+
+
+void affichage_struct(ELF_STRUCT file){
+	printf("\n\t\t\t[ Affichage du header ]\n\n");
+	aff_header(file);
+	printf("\n\t\t\t[ Affichage des sections header ]\n\n");
+	aff_Sheader(file);
+	printf("\n\t\t\t[ Affichage des symboles ]\n\n");
+	aff_Symtable(file);
+	/*printf("\n\t\t\t[ Affichage des relocations ]\n\n");
+	aff_Reloc(file); */	
 }

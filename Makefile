@@ -5,7 +5,7 @@ all: lecture fusion
 lecture: main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o fill_struct.o 
 	$(CC) -o $@ $^
 
-fusion: testfus.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o fill_struct.o sectionfus.o fusion.o filewriter.o
+fusion: testfus.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o fill_struct.o sectionfus.o fusion.o filewriter.o fusrel.o symbolfus.o
 	$(CC) -o $@ $^
 
 %.o: %.c                          
@@ -24,6 +24,8 @@ fill_struct.o: filereader.h elfheader.h elfsectiontab.h elfsection.h elfsymbtab.
 testfus.o : filereader.h elfheader.h elfsectiontab.h elfsection.h elfsymbtab.h elfreloc.h fill_struct.h
 fusion.o: elfreloc.h filereader.h elfheader.h elfsectiontab.h elfsection.h elfsymbtab.h sectionfus.h
 filewriter.o: elfreloc.h
+symbolfus.o: filereader.h sectionfus.h elfsymbtab.h
+fusrel.o: elfreloc.h elfsection.h
 
 clean:
-	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o testfus.o fusion.o fill_struct.o lecture fusion filewriter.o sectionfus.o
+	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o testfus.o fusion.o fill_struct.o lecture fusion filewriter.o sectionfus.o fusrel.o symbolfus.o
