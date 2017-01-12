@@ -33,14 +33,13 @@ int main(int argc, char* argv[]){
 		printf("%20s | pour afficher les infos du header\n", "-h");
 		printf("%20s | pour afficher les symboles\n", "-s");
 		printf("%20s | pour afficher la section de ce nom ou numéro\n", "-x <nombre/nom>");
+		printf("%20s | pour afficher le contenu de toutes les sections\n", "-X");
 		printf("%20s | pour afficher les relocs\n", "-r");
 		printf("%20s | pour afficher les sections header\n\n", "-S");
 
 	} else {
 
 		////// REMPLISSAGE //////
-
-		//strcpy(argv[argc-1], argv[argc-1]);
 
 		if(fill(&file, argv[argc-1])){
 			
@@ -74,6 +73,13 @@ int main(int argc, char* argv[]){
 				if(est_present("-s", argc, argv) != 0){
 					printf("\n\t\t\t[ Affichage des symboles ]\n\n");
 					aff_Symtable(file);
+				}
+
+				if(est_present("-X", argc, argv) != 0){
+					printf("\n\t\t\t[ Affichage du contenu des sections ]\n\n");
+					for(int i=0; i<file.header->e_shnum; i++){
+						aff_section(file, "", i);
+					}
 				}
 
 
