@@ -148,17 +148,17 @@ void aff_Symtable(ELF_STRUCT file){
 		//affichage de l'index
 		switch(file.symtab[j].symbole.st_shndx){
 			      case SHN_UNDEF:
-				printf("UND");
+				printf(" UND");
 				break;
 			      case SHN_ABS:
-				printf("ABS");
+				printf(" ABS");
 				break;
 			      default:
-				printf("%3d",file.symtab[j].symbole.st_shndx);
+				printf("%4d",file.symtab[j].symbole.st_shndx);
 				break;
 		}
 
-		printf(" | ");
+		printf("  | ");
 
 		for(i=0;i<file.header->e_shnum;i++){
 			if(i != file.header->e_shstrndx && file.shtab[i].sh_type == 3){
