@@ -13,5 +13,5 @@
 #include "sectionfus.h"
 
 
-void fusion(ELF_STRUCT file1, ELF_STRUCT file2 ,ELF_STRUCT res, sect_tab * tab, int nbtab);
+void fusion(ELF_STRUCT file1, ELF_STRUCT file2 ,ELF_STRUCT * res, sect_tab * tab, int nbtab);
 

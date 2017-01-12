@@ -26,6 +26,7 @@ void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab 
 	fileres->shtab[indice_sfinal].sh_info=file1.shtab[indice_s1].sh_info;
 	fileres->shtab[indice_sfinal].sh_addralign=file1.shtab[indice_s1].sh_addralign;
 	fileres->shtab[indice_sfinal].sh_entsize=file1.shtab[indice_s1].sh_entsize;
+	
 
 }
 
@@ -83,7 +84,7 @@ void fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_ta
 	fileres->shtab[indice_sfinal].sh_entsize=file2.shtab[indice_s2].sh_entsize;
 }
 
-int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab){
+sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab){
 
 	char * name1;
 	char * name2;
@@ -93,8 +94,6 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 	int indice_strndx = 0;
 	int j  = 0;
 	int place = file1.header->e_ehsize; // à déterminer, offset du premier, taille de header etc....?
-	//int length1  = file1.header->e_shnum;
-	//int length2  = file2.header->e_shnum;
 	
 
 	////HEADERS DE SECTIONS/////
@@ -136,7 +135,8 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 			}
 			fusion = 0;
 		}
-		else if (file1.shtab[i].sh_type  ==  SHT_STRTAB && i == file1.header->e_shstrndx){
+		else if ((file1.shtab[i].sh_type  ==  SHT_STRTAB) && (i == file1.header->e_shstrndx)){
+			//indice_strndx=i;
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j == file2.header->e_shstrndx){
@@ -147,7 +147,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 			}
 		}
 
-		else if(file1.shtab[i].sh_type  == SHT_STRTAB && i != file1.header->e_shstrndx){
+		else if((file1.shtab[i].sh_type  == SHT_STRTAB )&& (i != file1.header->e_shstrndx)){
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j != file2.header->e_shstrndx){
@@ -238,5 +238,5 @@ fileres->header->e_shoff = file1.header->e_ehsize;
 fileres->header->e_shnum = cpt;
 fileres->header->e_shstrndx = indice_strndx;
 //////FIN HEADER///////
-return cpt;
+return tab;
 }

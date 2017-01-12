@@ -15,6 +15,6 @@ typedef struct {
 	int type, fusion, offset;
 } sect_tab;
 
-int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab);
+sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab);
 
 #endif

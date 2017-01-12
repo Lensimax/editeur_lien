@@ -233,8 +233,10 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 
 	file_final->shtab[getIndSectionSymtab(file_final->header,file_final->shtab)].sh_size = compteur_symtab_final*file_final->shtab[getIndSectionSymtab(file_final->header,file_final->shtab)].sh_entsize;
 	for(int i = getIndSectionSymtab(file_final->header,file_final->shtab); i<file_final->header->e_shnum;i++){
-		file_final->shtab[i].sh_offset -= ((file_1.shtab[getIndSectionSymtab(file_1.header,file_1.shtab)].sh_size + file_2.shtab[getIndSectionSymtab(file_2.header,file_2.shtab)].sh_size) - compteur_symtab_final);
+		
+file_final->shtab[i].sh_offset -= ((file_1.shtab[getIndSectionSymtab(file_1.header,file_1.shtab)].sh_size + file_2.shtab[getIndSectionSymtab(file_2.header,file_2.shtab)].sh_size) - compteur_symtab_final);
 	}
+	
 
 
 //return compteur_locaux_fichier;

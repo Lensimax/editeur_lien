@@ -58,7 +58,10 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 				for(int x=0;x<nbIndSectionReltab(file_1);x++){
 					if(file_1.tabrel[x].indice_section == i) {
 						for(int n=0; n<file_1.shtab[i].sh_size/file_1.shtab[i].sh_entsize; n++) {
-							file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section] = file_1.tabrel[x].reltab[n];
+							if (n==0) {
+								file_final->tabrel[compteur_section_rel_final].reltab = malloc (sizeof(Elf32_Rel));
+							}
+							file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section] = file_1.tabrel[x].reltab[n]; // LIGNE DE L'ERREUR DE SEGMENTATION
 							correction_num_symb_reloc(file_final,&file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section]);
 							compteur_rel_par_section++;
 						}
@@ -89,6 +92,9 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 				for(int x=0;x<nbIndSectionReltab(file_2);x++){
 					if(file_2.tabrel[x].indice_section == i) {
 						for(int n=0; n<file_2.shtab[i].sh_size/file_2.shtab[i].sh_entsize; n++) {
+							if (n==0) {
+								file_final->tabrel[compteur_section_rel_final].reltab = malloc (sizeof(Elf32_Rel));
+							}
 							file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section] = file_2.tabrel[x].reltab[n];
 							correction_num_symb_reloc(file_final,&file_final->tabrel[compteur_section_rel_final].reltab[compteur_rel_par_section]);
 							compteur_rel_par_section++;
