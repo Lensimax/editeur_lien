@@ -28,4 +28,4 @@ symbolfus.o: filereader.h sectionfus.h elfsymbtab.h
 fusrel.o: elfreloc.h elfsection.h
 
 clean:
-	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o testfus.o fusion.o fill_struct.o lecture fusion filewriter.o sectionfus.o fusrel.o symbolfus.o
+	rm main.o filereader.o elfheader.o elfsectiontab.o elfsection.o util.o elfsymbtab.o elfreloc.o testfus.o fusion.o fill_struct.o filewriter.o sectionfus.o fusrel.o symbolfus.o
