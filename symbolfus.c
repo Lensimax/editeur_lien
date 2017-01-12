@@ -85,11 +85,12 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 		change_num_after_fusion(sect_fus, &file_final->symtab[compteur_symtab_final], nb_sect_after_fusion);
 		file_final->symtab[compteur_symtab_final].old_num = p2;
 		file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
-		file_final->symtab[compteur_symtab_final].symbole.st_name += 	file_1.shtab[indice_string_table_1].sh_size;
+		
+		file_final->symtab[compteur_symtab_final].symbole.st_name = file_final->symtab[compteur_symtab_final].symbole.st_name + file_1.shtab[indice_string_table_1].sh_size;
 		p2++;
 		compteur_locaux_fichier++;
 		compteur_symtab_final++;
-
+		
 	}
 
 	for (int k=p1;k<file_1.shtab[indice_symtab_1].sh_size/file_1.shtab[indice_symtab_1].sh_entsize;k++) {
@@ -205,7 +206,7 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 						file_final->symtab[compteur_symtab_final].fusion_num_f2 = k;
 						file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
 						change_num_after_fusion(sect_fus, &file_final->symtab[compteur_symtab_final], nb_sect_after_fusion);
-						file_final->symtab[compteur_symtab_final].symbole.st_name += 	file_1.shtab[indice_string_table_1].sh_size;
+						file_final->symtab[compteur_symtab_final].symbole.st_name += file_1.shtab[indice_string_table_1].sh_size;
 						compteur_symtab_final++;
 						
 					}
@@ -232,14 +233,13 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 
 
 	file_final->shtab[getIndSectionSymtab(file_final->header,file_final->shtab)].sh_size = compteur_symtab_final*file_final->shtab[getIndSectionSymtab(file_final->header,file_final->shtab)].sh_entsize;
-	for(int i = getIndSectionSymtab(file_final->header,file_final->shtab); i<file_final->header->e_shnum;i++){
-		
-file_final->shtab[i].sh_offset -= ((file_1.shtab[getIndSectionSymtab(file_1.header,file_1.shtab)].sh_size + file_2.shtab[getIndSectionSymtab(file_2.header,file_2.shtab)].sh_size) - compteur_symtab_final);
+
+	for(int i = getIndSectionSymtab(file_final->header,file_final->shtab)+1; i<file_final->header->e_shnum;i++){
+		file_final->shtab[i].sh_offset -= ((file_1.shtab[getIndSectionSymtab(file_1.header,file_1.shtab)].sh_size + file_2.shtab[getIndSectionSymtab(file_2.header,file_2.shtab)].sh_size) - (compteur_symtab_final)*sizeof(Elf32_Sym));
 	}
-	
 
 
-//return compteur_locaux_fichier;
+
 return 1;
 
 
