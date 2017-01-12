@@ -52,12 +52,18 @@ int main(int argc, char * argv[]){
 				tab = sectfusion(file1, file2, &res, tab);
 				nombre_section_apres_fusion=res.header->e_shnum;
 
+				
+
 				printf("Nombre section %d\n", nombre_section_apres_fusion);
 				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
 				//relfus(file1, file2, &res);
 				
 				fusion(file1,file2,&res,tab,nombre_section_apres_fusion);
-			
+
+				printf("Nom section %s\n",nom_section(res,res.header->e_shstrndx));	
+
+				res.fileBytes=readFileBytes(res.file_name);				
+
 				affichage_struct(res);
 
 				/*if(Write_file(file1, fich)){
