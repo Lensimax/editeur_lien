@@ -52,11 +52,6 @@ int main(int argc, char * argv[]){
 				tab = sectfusion(file1, file2, &res, tab);
 				nombre_section_apres_fusion=res.header->e_shnum;
 
-				/*for (int i = 0; i< nombre_section_apres_fusion; i++){
-
-					printf("offset après %d % d \n", tab[i].offset1 ,i );
-				}*/
-
 				printf("Nombre section %d\n", nombre_section_apres_fusion);
 				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
 				//relfus(file1, file2, &res);

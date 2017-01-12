@@ -6,7 +6,6 @@
 void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_s2, int indice_sfinal, int * place){
 
 	tab[indice_sfinal].offset1 = file1.shtab[indice_s1].sh_offset;
-	//printf("offset avant %d % d \n", tab[indice_sfinal].offset1 ,indice_sfinal );
 	tab[indice_sfinal].size1 = file1.shtab[indice_s1].sh_size;
 	tab[indice_sfinal].offset2 = file2.shtab[indice_s2].sh_offset;
 	tab[indice_sfinal].size2 = file2.shtab[indice_s2].sh_size;
@@ -95,8 +94,6 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 	int indice_strndx = 0;
 	int j  = 0;
 	int place = file1.header->e_ehsize; // à déterminer, offset du premier, taille de header etc....?
-	//int length1  = file1.header->e_shnum;
-	//int length2  = file2.header->e_shnum;
 	
 
 	////HEADERS DE SECTIONS/////
@@ -139,6 +136,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 			fusion = 0;
 		}
 		else if ((file1.shtab[i].sh_type  ==  SHT_STRTAB) && (i == file1.header->e_shstrndx)){
+			//indice_strndx=i;
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j == file2.header->e_shstrndx){
