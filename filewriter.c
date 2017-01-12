@@ -12,6 +12,7 @@ int Write_file(ELF_STRUCT file_struct, FILE *f){
 	//fwrite(file_struct.symtab->, sizeof(Elf32_Sym)*->e_shnum, 1, f);
 
 	for(int i=0; i<file_struct.header->e_shnum;i++){
+		
 		printf("Section %d\n", i);
 	}
 

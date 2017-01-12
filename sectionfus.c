@@ -13,7 +13,7 @@ void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab 
 	tab[indice_sfinal].newnum=indice_sfinal;
 	tab[indice_sfinal].offset= *place;
 	tab[indice_sfinal].fusion=1;
-	
+
 	*place = *place+tab[indice_sfinal].size1+tab[indice_sfinal].size2;
 
 	fileres->shtab[indice_sfinal].sh_name=file1.shtab[indice_s1].sh_name;
@@ -35,7 +35,7 @@ void fnc_non_fus(ELF_STRUCT file1, ELF_STRUCT * fileres, sect_tab * tab, int ind
 	tab[indice_sfinal].size1 = file1.shtab[indice_s1].sh_size;
 	tab[indice_sfinal].offset2 = 0;
 	tab[indice_sfinal].size2 = 0;
-	tab[indice_sfinal].numorigin=indice_sfinal;
+	tab[indice_sfinal].numorigin=indice_s1;
 	tab[indice_sfinal].newnum=indice_sfinal;
 	tab[indice_sfinal].fusion=0;
 
@@ -112,8 +112,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 		}
 
 		strcpy(tab[cpt].name,name1); // stockage dans la structure sect_tab
-		printf("1 : ");
-		printf("%s\n",tab[cpt].name);
+		
 		tab[cpt].type = file1.shtab[i].sh_type; // stockage du type
 
 	
@@ -163,6 +162,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_SYMTAB){
 						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
+						fileres->indice_symtab = cpt;
 						cpt++;
 				}
 				j++;
@@ -219,9 +219,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 					tab  =  realloc(tab,sizeof(sect_tab)*(cpt+1));
 					fileres->shtab = realloc(fileres->shtab, sizeof(Elf32_Shdr)*(cpt+1));
 				}
-				strcpy(tab[cpt].name,name2);
-				printf("2 : ");
-				printf("%s\n",tab[cpt].name);		
+				strcpy(tab[cpt].name,name2);		
 				tab[cpt].type = file2.shtab[cpt].sh_type;
 				fnc_fus_2(file1,file2,fileres,tab,i,cpt,&place);
 				cpt++;				

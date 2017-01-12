@@ -48,10 +48,9 @@ int main(int argc, char * argv[]){
 				res.symtab = malloc(sizeof(STRUCT_SYM));
 				nombre_section_apres_fusion = sectfusion(file1, file2, &res, tab);
 				printf("Nombre section %d\n", nombre_section_apres_fusion);
-				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);
+				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
+				relfus(file1, file2, &res);
 				affichage_struct(res);
-				//relfus(file1, file2, &res);
-
 
 				/*if(Write_file(file1, fich)){
 					printf("Ecriture faites\n");
@@ -69,9 +68,9 @@ int main(int argc, char * argv[]){
 		}
 
 		fclose(fich);
-		free(res.symtab);
+	/*	free(res.symtab);
 		free(res.shtab);
-		free(res.tabrel);
+		free(res.tabrel);*/
 	}
 
 

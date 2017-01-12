@@ -5,8 +5,9 @@
 void change_num_after_fusion(sect_tab * sect_fus, STRUCT_SYM * symbol, int nb_sect_after_fusion){
 
 	for(int i = 0; i<nb_sect_after_fusion;i++) {
-		if(sect_fus[i].numorigin == symbol->symbole.st_shndx) {
+		if(sect_fus[i].numorigin == symbol->symbole.st_shndx && sect_fus[i].fusion==1) {
 			if(sect_fus[i].numorigin != sect_fus[i].newnum) {
+				
 				symbol->symbole.st_shndx=sect_fus[i].newnum;
 				if(sect_fus[i].fusion == 1) {
 				symbol->symbole.st_value+=sect_fus[i].size1;
@@ -68,6 +69,7 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 ///////////////////////////////////PARCOURS DE LA 1ERE TABLE DE SYMBOLES
 	while(!ELF32_ST_BIND(file_1.symtab[p1].symbole.st_info) && p1 < (file_1.shtab[indice_symtab_1].sh_size/file_1.shtab[indice_symtab_1].sh_entsize)) {
 
+		
 		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_1.symtab[p1].symbole);
 		file_final->symtab[compteur_symtab_final].old_num = p1;
 		file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
@@ -78,8 +80,8 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 
 	while(!ELF32_ST_BIND(file_2.symtab[p2].symbole.st_info) && p2 < (file_2.shtab[indice_symtab_2].sh_size/file_2.shtab[indice_symtab_2].sh_entsize)) {
 
-		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_2.symtab[p2].symbole);
 		
+		ajout_symbole_symtable_finale(&compteur_symtab_final, file_final, file_2.symtab[p2].symbole);		
 		change_num_after_fusion(sect_fus, &file_final->symtab[compteur_symtab_final], nb_sect_after_fusion);
 		file_final->symtab[compteur_symtab_final].old_num = p2;
 		file_final->symtab[compteur_symtab_final].new_num = compteur_symtab_final;
@@ -124,6 +126,7 @@ int symbolfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, sec
 				nameString_2[j] = 0;
 				
 				if(strcmp(nameString_1,nameString_2) == 0 && nameString_1[0] != '\0') {
+					
 					boolean = 1;
 					if(file_2.symtab[l].symbole.st_shndx != SHN_UNDEF && file_1.symtab[k].symbole.st_shndx != SHN_UNDEF) {
 						printf("\nERREUR 2 SYMBOLES DEFINIS DE MEME NOMS, IMPOSSIBLE DE FUSIONNER LES FICHIERS\n");
