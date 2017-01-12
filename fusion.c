@@ -30,7 +30,6 @@ void fusion(ELF_STRUCT file1, ELF_STRUCT file2 ,ELF_STRUCT * res, sect_tab * tab
 	for (int i=0; i<nbtab;i++){
 
 		if (/*(res->shtab[i].sh_type!=SHT_REL)&&*/(res->shtab[i].sh_type!=SHT_SYMTAB)){
-
 			if(tab[i].size1!=0){
 				//printf("(tab[i].offset1) %d %d \n",(tab[i].offset1), i);
 				fwrite(file1.fileBytes+(tab[i].offset1),1,tab[i].size1,fileres);
