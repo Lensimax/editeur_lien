@@ -27,7 +27,6 @@ int main(int argc, char * argv[]){
 	ELF_STRUCT file2;
 	ELF_STRUCT res;
 	sect_tab *tab;
-	//sect_tab **tab2=&tab;
 
 	int nombre_section_apres_fusion;
 
@@ -42,7 +41,7 @@ int main(int argc, char * argv[]){
 		if(fich){
 			if(fill(&file1, argv[1]) && fill(&file2, argv[2])){
 
-				// affichage_struct(file1);
+
 
 				tab = malloc(sizeof(sect_tab));
 				res.shtab = malloc(sizeof(Elf32_Shdr));
@@ -54,9 +53,7 @@ int main(int argc, char * argv[]){
 
 				
 
-				printf("Nombre section %d\n", nombre_section_apres_fusion);
-				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
-				//relfus(file1, file2, &res);
+				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);	
 				
 				fusion(file1,file2,&res,tab,nombre_section_apres_fusion);
 
@@ -65,11 +62,6 @@ int main(int argc, char * argv[]){
 
 				affichage_struct(res);
 
-				/*if(Write_file(file1, fich)){
-					printf("Ecriture faites\n");
-				} else {
-					printf("Ecriture echouée\n");
-				}*/
 
 
 			} else {
@@ -81,9 +73,9 @@ int main(int argc, char * argv[]){
 		}
 
 		fclose(fich);
-	/*	free(res.symtab);
+		free(res.symtab);
 		free(res.shtab);
-		free(res.tabrel);*/
+		free(tab);
 	}
 
 
