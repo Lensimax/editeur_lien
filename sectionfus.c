@@ -59,11 +59,11 @@ void fnc_non_fus(ELF_STRUCT file1, ELF_STRUCT * fileres, sect_tab * tab, int ind
 
 }
 
-void fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_s2, int indice_sfinal, int * place){
-	tab[indice_sfinal].offset1 = file1.shtab[indice_s1].sh_offset;
-	tab[indice_sfinal].size1 = file1.shtab[indice_s1].sh_size;
-	tab[indice_sfinal].offset2 = 0;
-	tab[indice_sfinal].size2 = 0;
+void fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s2, int indice_sfinal, int * place){
+	tab[indice_sfinal].offset1 = 0;
+	tab[indice_sfinal].size1 = 0;
+	tab[indice_sfinal].offset2 = file2.shtab[indice_s2].sh_offset;
+	tab[indice_sfinal].size2 = file2.shtab[indice_s2].sh_size;;
 	tab[indice_sfinal].numorigin=indice_s2;
 	tab[indice_sfinal].newnum=indice_sfinal;
 	tab[indice_sfinal].offset=*place;
@@ -87,6 +87,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 
 	char * name1;
 	char * name2;
+	int a_meme_nom;
 	int cpt  =  0;
 	int fusion = 0;
 	int indice_strndx = 0;
@@ -111,7 +112,8 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 		}
 
 		strcpy(tab[cpt].name,name1); // stockage dans la structure sect_tab
-
+		printf("1 : ");
+		printf("%s\n",tab[cpt].name);
 		tab[cpt].type = file1.shtab[i].sh_type; // stockage du type
 
 	
@@ -125,6 +127,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 						cpt++;
 						fusion = 1;
 					}
+					free(name2);
 				}
 				j++;
 			}
@@ -136,7 +139,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 		}
 		else if (file1.shtab[i].sh_type  ==  SHT_STRTAB && i == file1.header->e_shstrndx){
 			j=0;
-			while ((j < file2.header->e_shnum)&&(!fusion)){
+			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j == file2.header->e_shstrndx){
 						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
 						cpt++;
@@ -147,7 +150,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 
 		else if(file1.shtab[i].sh_type  == SHT_STRTAB && i != file1.header->e_shstrndx){
 			j=0;
-			while ((j < file2.header->e_shnum)&&(!fusion)){
+			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j != file2.header->e_shstrndx){
 						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
 						cpt++;
@@ -157,7 +160,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 		}
 		else if(file1.shtab[i].sh_type  == SHT_SYMTAB){
 			j=0;
-			while ((j < file2.header->e_shnum)&&(!fusion)){
+			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_SYMTAB){
 						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
 						cpt++;
@@ -176,6 +179,7 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 							cpt++;
 							fusion = 1;
 						}
+						free(name2);
 					}
 					j++;
 				}
@@ -190,29 +194,42 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 			fnc_non_fus(file1,fileres,tab,i,cpt,&place);
 			cpt++;			
 		}
+	free(name1);
 	}
 
 	////////2EME FICHIER
 
 	for (int i  =  0; i < file2.header->e_shnum; i++){
-		
+		a_meme_nom = 0;
 		name2  =  nom_section(file2,i);
 	
 		if(file2.shtab[i].sh_type != SHT_STRTAB && file2.shtab[i].sh_type != SHT_SYMTAB) {
+			j=0;
 			while (j < file1.header->e_shnum){
-					name1  =  nom_section(file1,j);
-					if(strcmp(name1,name2)!=0) {
-						if (cpt !=  0){
-							tab  =  realloc(tab,sizeof(sect_tab)*(cpt+1));
-							fileres->shtab = realloc(fileres->shtab, sizeof(Elf32_Shdr)*(cpt+1));
-						}
-						strcpy(tab[cpt].name,name2);		
-						tab[cpt].type = file2.shtab[cpt].sh_type;
-						fnc_fus_2(file1,file2,fileres,tab,j,i,cpt,&place);
-						cpt++;
-					}
+				name1  =  nom_section(file1,j);
+				if(strcmp(name1,name2)==0) {
+					a_meme_nom=1;
+				}
+				j++;
+				free(name1);
 			}
-		}	
+			
+			if(!a_meme_nom){
+				if (cpt !=  0){
+					tab  =  realloc(tab,sizeof(sect_tab)*(cpt+1));
+					fileres->shtab = realloc(fileres->shtab, sizeof(Elf32_Shdr)*(cpt+1));
+				}
+				strcpy(tab[cpt].name,name2);
+				printf("2 : ");
+				printf("%s\n",tab[cpt].name);		
+				tab[cpt].type = file2.shtab[cpt].sh_type;
+				fnc_fus_2(file1,file2,fileres,tab,i,cpt,&place);
+				cpt++;				
+			}
+				
+			
+		}
+		free(name2);	
 	}
 
 ////////FIN HEADERS DE SECTIONS///////
