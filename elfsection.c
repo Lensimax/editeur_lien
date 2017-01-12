@@ -81,42 +81,50 @@ void aff_section(ELF_STRUCT file, char *section_name, int section_index){
 	
 	if (isValid == 1) {
 
+		i=section.sh_offset;
+
+		if(i<section.sh_offset+section.sh_size){
+
+
 		printf("Contenu de la section << %s >>\n", name); // a completer avec String Table
 
-		for(i=section.sh_offset; i<section.sh_offset+section.sh_size; i+=16){ // ligne
+			for(i=section.sh_offset; i<section.sh_offset+section.sh_size; i+=16){ // ligne
 
-			printf("0x%.8x | ", i-section.sh_offset); // affichage adresse ligne
+				printf("0x%.8x | ", i-section.sh_offset); // affichage adresse ligne
 
-			for(k=0; k<4; k++){ /// affichage de l'hexa
-				l=i+k*4;
-				while(l<i+(k+1)*4 && l<section.sh_offset+section.sh_size){
-					printf("%.2x", file.fileBytes[l]);
-					l++;
-				}
-
-				while(l<i+(k+1)*4){ // remplissage des vides 
-					printf("  ");
-					l++;
-				}
-				printf(" ");
-			}
-
-			printf("| ");
-
-			for(k=0; k<4; k++){ //// affichage des caractère
-				l=i+k*4;
-				while(l<i+(k+1)*4 && l<section.sh_offset+section.sh_size){
-					if(file.fileBytes[l] >= 33 && file.fileBytes[l] < 128){
-						printf("%c", file.fileBytes[l]);						
-					} else {
-						printf(".");
+				for(k=0; k<4; k++){ /// affichage de l'hexa
+					l=i+k*4;
+					while(l<i+(k+1)*4 && l<section.sh_offset+section.sh_size){
+						printf("%.2x", file.fileBytes[l]);
+						l++;
 					}
-					l++;
+
+					while(l<i+(k+1)*4){ // remplissage des vides 
+						printf("  ");
+						l++;
+					}
+					printf(" ");
 				}
+
+				printf("| ");
+
+				for(k=0; k<4; k++){ //// affichage des caractère
+					l=i+k*4;
+					while(l<i+(k+1)*4 && l<section.sh_offset+section.sh_size){
+						if(file.fileBytes[l] >= 33 && file.fileBytes[l] < 128){
+							printf("%c", file.fileBytes[l]);						
+						} else {
+							printf(".");
+						}
+						l++;
+					}
+				}
+
+				printf("\n");
+
 			}
-
-			printf("\n");
-
+		} else {
+			printf("Il n\'y a rien à afficher dans cette section\n");
 		}
 
 	} 
