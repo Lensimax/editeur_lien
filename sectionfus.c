@@ -215,15 +215,13 @@ int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_t
 		}	
 	}
 
-//\\\\\HEADERS DE SECTIONS\\\\\
-
+////////FIN HEADERS DE SECTIONS///////
 
 //////HEADER///////
 fileres->header = file1.header;
 fileres->header->e_shoff = file1.header->e_ehsize;
 fileres->header->e_shnum = cpt;
 fileres->header->e_shstrndx = indice_strndx;
-//\\\\HEADER\\\\\\\
-
+//////FIN HEADER///////
 return cpt;
 }
