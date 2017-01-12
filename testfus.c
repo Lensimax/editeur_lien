@@ -27,6 +27,7 @@ int main(int argc, char * argv[]){
 	ELF_STRUCT file2;
 	ELF_STRUCT res;
 	sect_tab *tab;
+	//sect_tab **tab2=&tab;
 
 	int nombre_section_apres_fusion;
 
@@ -37,7 +38,7 @@ int main(int argc, char * argv[]){
 	} else {
 
 		fich = fopen(argv[argc-1], "w");
-
+		strcpy(res.file_name,argv[argc-1]);
 		if(fich){
 			if(fill(&file1, argv[1]) && fill(&file2, argv[2])){
 
@@ -46,11 +47,23 @@ int main(int argc, char * argv[]){
 				tab = malloc(sizeof(sect_tab));
 				res.shtab = malloc(sizeof(Elf32_Shdr));
 				res.symtab = malloc(sizeof(STRUCT_SYM));
-				nombre_section_apres_fusion = sectfusion(file1, file2, &res, tab);
+
+
+				tab = sectfusion(file1, file2, &res, tab);
+				nombre_section_apres_fusion=res.header->e_shnum;
+
+				/*for (int i = 0; i< nombre_section_apres_fusion; i++){
+
+					printf("offset après %d % d \n", tab[i].offset1 ,i );
+				}*/
+
 				printf("Nombre section %d\n", nombre_section_apres_fusion);
-				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
-				relfus(file1, file2, &res);
-				affichage_struct(res);
+				//symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
+				//relfus(file1, file2, &res);
+				
+				fusion(file1,file2,res,tab,nombre_section_apres_fusion);
+			
+				//affichage_struct(res);
 
 				/*if(Write_file(file1, fich)){
 					printf("Ecriture faites\n");

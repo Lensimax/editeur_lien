@@ -6,6 +6,7 @@
 void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_s2, int indice_sfinal, int * place){
 
 	tab[indice_sfinal].offset1 = file1.shtab[indice_s1].sh_offset;
+	//printf("offset avant %d % d \n", tab[indice_sfinal].offset1 ,indice_sfinal );
 	tab[indice_sfinal].size1 = file1.shtab[indice_s1].sh_size;
 	tab[indice_sfinal].offset2 = file2.shtab[indice_s2].sh_offset;
 	tab[indice_sfinal].size2 = file2.shtab[indice_s2].sh_size;
@@ -26,6 +27,7 @@ void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab 
 	fileres->shtab[indice_sfinal].sh_info=file1.shtab[indice_s1].sh_info;
 	fileres->shtab[indice_sfinal].sh_addralign=file1.shtab[indice_s1].sh_addralign;
 	fileres->shtab[indice_sfinal].sh_entsize=file1.shtab[indice_s1].sh_entsize;
+	
 
 }
 
@@ -83,7 +85,7 @@ void fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_ta
 	fileres->shtab[indice_sfinal].sh_entsize=file2.shtab[indice_s2].sh_entsize;
 }
 
-int sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab){
+sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab){
 
 	char * name1;
 	char * name2;
@@ -238,5 +240,5 @@ fileres->header->e_shoff = file1.header->e_ehsize;
 fileres->header->e_shnum = cpt;
 fileres->header->e_shstrndx = indice_strndx;
 //////FIN HEADER///////
-return cpt;
+return tab;
 }
