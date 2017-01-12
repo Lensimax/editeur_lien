@@ -13,15 +13,5 @@
 #include "sectionfus.h"
 
 
-void affichebin1(unsigned char n);
-
-
-void affichebin2(Elf32_Word n);
-
-
-void affichebin4(Elf32_Half n);
-
-
-
-void fusion(Elf32_Ehdr * header,Elf32_Shdr * shtab, sect_tab * tab, int nbtab,char *filePath1, char *filePath2);
+void fusion(ELF_STRUCT file1, ELF_STRUCT file2 ,ELF_STRUCT res, sect_tab * tab, int nbtab);
 
