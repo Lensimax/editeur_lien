@@ -138,7 +138,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 			}
 			fusion = 0;
 		}
-		else if (file1.shtab[i].sh_type  ==  SHT_STRTAB && i == file1.header->e_shstrndx){
+		else if ((file1.shtab[i].sh_type  ==  SHT_STRTAB) && (i == file1.header->e_shstrndx)){
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j == file2.header->e_shstrndx){
@@ -149,7 +149,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 			}
 		}
 
-		else if(file1.shtab[i].sh_type  == SHT_STRTAB && i != file1.header->e_shstrndx){
+		else if((file1.shtab[i].sh_type  == SHT_STRTAB )&& (i != file1.header->e_shstrndx)){
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j != file2.header->e_shstrndx){

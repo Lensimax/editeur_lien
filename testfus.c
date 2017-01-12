@@ -58,12 +58,12 @@ int main(int argc, char * argv[]){
 				}*/
 
 				printf("Nombre section %d\n", nombre_section_apres_fusion);
-				//symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
+				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);				
 				//relfus(file1, file2, &res);
 				
-				fusion(file1,file2,res,tab,nombre_section_apres_fusion);
+				fusion(file1,file2,&res,tab,nombre_section_apres_fusion);
 			
-				//affichage_struct(res);
+				affichage_struct(res);
 
 				/*if(Write_file(file1, fich)){
 					printf("Ecriture faites\n");
