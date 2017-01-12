@@ -3,7 +3,7 @@
 #include "filereader.h"
 #include "sectionfus.h"
 
-void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_s2, int indice_sfinal, int * place){
+int fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_s2, int indice_sfinal, int place){
 
 	tab[indice_sfinal].offset1 = file1.shtab[indice_s1].sh_offset;
 	tab[indice_sfinal].size1 = file1.shtab[indice_s1].sh_size;
@@ -11,10 +11,10 @@ void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab 
 	tab[indice_sfinal].size2 = file2.shtab[indice_s2].sh_size;
 	tab[indice_sfinal].numorigin=indice_s2;
 	tab[indice_sfinal].newnum=indice_sfinal;
-	tab[indice_sfinal].offset= *place;
+	tab[indice_sfinal].offset= place;
 	tab[indice_sfinal].fusion=1;
 
-	*place = *place+tab[indice_sfinal].size1+tab[indice_sfinal].size2;
+	place = place+tab[indice_sfinal].size1+tab[indice_sfinal].size2;
 
 	fileres->shtab[indice_sfinal].sh_name=file1.shtab[indice_s1].sh_name;
 	fileres->shtab[indice_sfinal].sh_type=file1.shtab[indice_s1].sh_type;
@@ -26,11 +26,13 @@ void fnc_fus(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab 
 	fileres->shtab[indice_sfinal].sh_info=file1.shtab[indice_s1].sh_info;
 	fileres->shtab[indice_sfinal].sh_addralign=file1.shtab[indice_s1].sh_addralign;
 	fileres->shtab[indice_sfinal].sh_entsize=file1.shtab[indice_s1].sh_entsize;
+
+	return place;
 	
 
 }
 
-void fnc_non_fus(ELF_STRUCT file1, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_sfinal, int * place){
+int fnc_non_fus(ELF_STRUCT file1, ELF_STRUCT * fileres, sect_tab * tab, int indice_s1, int indice_sfinal, int place){
 
 	tab[indice_sfinal].offset1 = file1.shtab[indice_s1].sh_offset;
 	tab[indice_sfinal].size1 = file1.shtab[indice_s1].sh_size;
@@ -39,13 +41,12 @@ void fnc_non_fus(ELF_STRUCT file1, ELF_STRUCT * fileres, sect_tab * tab, int ind
 	tab[indice_sfinal].numorigin=indice_s1;
 	tab[indice_sfinal].newnum=indice_sfinal;
 	tab[indice_sfinal].fusion=0;
+	tab[indice_sfinal].offset= place;	
 
-
-	tab[indice_sfinal].offset= *place;	
-	*place= *place+tab[indice_sfinal].size1;
-	if(indice_sfinal == 0){
+	place= place+tab[indice_sfinal].size1;
+	/*if(indice_sfinal == 0){
 		tab[indice_sfinal].offset=0;
-	}
+	}*/
 
 	fileres->shtab[indice_sfinal].sh_name=file1.shtab[indice_s1].sh_name;
 	fileres->shtab[indice_sfinal].sh_type=file1.shtab[indice_s1].sh_type;
@@ -58,19 +59,20 @@ void fnc_non_fus(ELF_STRUCT file1, ELF_STRUCT * fileres, sect_tab * tab, int ind
 	fileres->shtab[indice_sfinal].sh_addralign=file1.shtab[indice_s1].sh_addralign;
 	fileres->shtab[indice_sfinal].sh_entsize=file1.shtab[indice_s1].sh_entsize;
 
+	return place;
 }
 
-void fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s2, int indice_sfinal, int * place){
+int fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab, int indice_s2, int indice_sfinal, int place){
 	tab[indice_sfinal].offset1 = 0;
 	tab[indice_sfinal].size1 = 0;
 	tab[indice_sfinal].offset2 = file2.shtab[indice_s2].sh_offset;
 	tab[indice_sfinal].size2 = file2.shtab[indice_s2].sh_size;;
 	tab[indice_sfinal].numorigin=indice_s2;
 	tab[indice_sfinal].newnum=indice_sfinal;
-	tab[indice_sfinal].offset=*place;
+	tab[indice_sfinal].offset=place;
 	tab[indice_sfinal].fusion=0;
 
-	*place = *place+tab[indice_sfinal].size2;
+	place = place+tab[indice_sfinal].size2;
 	
 	fileres->shtab[indice_sfinal].sh_name=file2.shtab[indice_s2].sh_name+file1.shtab[file1.header->e_shstrndx].sh_size;
 	fileres->shtab[indice_sfinal].sh_type=file2.shtab[indice_s2].sh_type;
@@ -82,6 +84,8 @@ void fnc_fus_2(ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_ta
 	fileres->shtab[indice_sfinal].sh_info=file2.shtab[indice_s2].sh_info;
 	fileres->shtab[indice_sfinal].sh_addralign=file2.shtab[indice_s2].sh_addralign;
 	fileres->shtab[indice_sfinal].sh_entsize=file2.shtab[indice_s2].sh_entsize;
+
+	return place;
 }
 
 sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres, sect_tab * tab){
@@ -121,7 +125,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 				if (file2.shtab[j].sh_type  ==  SHT_REL){
 					name2  =  nom_section(file2,j);
 					if (strcmp(name1,name2) == 0){
-						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
+						place=fnc_fus(file1,file2,fileres,tab,i,j,cpt,place);
 						cpt++;
 						fusion = 1;
 					}
@@ -130,17 +134,17 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 				j++;
 			}
 			if(!fusion){
-				fnc_non_fus(file1,fileres,tab,i,cpt,&place);
+				place=fnc_non_fus(file1,fileres,tab,i,cpt,place);
 				cpt++;
 			}
 			fusion = 0;
 		}
 		else if ((file1.shtab[i].sh_type  ==  SHT_STRTAB) && (i == file1.header->e_shstrndx)){
-			//indice_strndx=i;
 			j=0;
+			indice_strndx=i;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j == file2.header->e_shstrndx){
-						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
+						place=fnc_fus(file1,file2,fileres,tab,i,j,cpt,place);
 						cpt++;
 				}
 				j++;
@@ -151,7 +155,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_STRTAB && j != file2.header->e_shstrndx){
-						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
+						place=fnc_fus(file1,file2,fileres,tab,i,j,cpt,place);
 						cpt++;
 				}
 				j++;
@@ -161,7 +165,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 			j=0;
 			while (j < file2.header->e_shnum){
 				if (file2.shtab[j].sh_type  ==  SHT_SYMTAB){
-						fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
+						place=fnc_fus(file1,file2,fileres,tab,i,j,cpt,place);
 						fileres->indice_symtab = cpt;
 						cpt++;
 				}
@@ -175,7 +179,7 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 					if (file2.shtab[j].sh_type  ==  SHT_PROGBITS){
 						name2  =  nom_section(file2,j);
 						if (strcmp(name1,name2) == 0){
-							fnc_fus(file1,file2,fileres,tab,i,j,cpt,&place);
+							place=fnc_fus(file1,file2,fileres,tab,i,j,cpt,place);
 							cpt++;
 							fusion = 1;
 						}
@@ -184,14 +188,14 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 					j++;
 				}
 				if(!fusion){
-					fnc_non_fus(file1,fileres,tab,i,cpt,&place);
+					place=fnc_non_fus(file1,fileres,tab,i,cpt,place);
 					cpt++;
 				}
 				fusion = 0;		
 		}
 
 		else {
-			fnc_non_fus(file1,fileres,tab,i,cpt,&place);
+			place=fnc_non_fus(file1,fileres,tab,i,cpt,place);
 			cpt++;			
 		}
 	free(name1);
@@ -221,13 +225,19 @@ sect_tab * sectfusion( ELF_STRUCT file1, ELF_STRUCT file2, ELF_STRUCT * fileres,
 				}
 				strcpy(tab[cpt].name,name2);		
 				tab[cpt].type = file2.shtab[cpt].sh_type;
-				fnc_fus_2(file1,file2,fileres,tab,i,cpt,&place);
+				place=fnc_fus_2(file1,file2,fileres,tab,i,cpt,place);
 				cpt++;				
 			}
 				
 			
 		}
 		free(name2);	
+	}
+
+	for (int i  =  0; i < cpt; i++){
+
+		fileres->shtab[i].sh_offset+=(cpt)*sizeof(Elf32_Shdr) ;
+
 	}
 
 ////////FIN HEADERS DE SECTIONS///////
