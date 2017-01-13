@@ -7,7 +7,6 @@ int main(){
 
 	i = factoriel(3);
 
-	printf("facto %d\n", i);
 
 	return 0;
 }

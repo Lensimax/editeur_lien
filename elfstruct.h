@@ -28,11 +28,7 @@ typedef struct ELF_STRUCT {
 	Elf32_Shdr *shtab; // 4e
 	STRUCT_SYM *symtab; // 7e
 	STRUCT_REL * tabrel; // 8e
-	unsigned char **sections_content; // malloc( sizeof(char *) * elf_struct->elf_header->e_shnum ), 5e
-	char *section_names;
-	int nb_sections; // elf_struct->elf_header->e_shnum;, init en 3e
-	int str_table_idx; // 6e
-	int symb_table_idx; // 6e
+	
 
 	int indice_symtab;
 
@@ -41,6 +37,13 @@ typedef struct ELF_STRUCT {
 	unsigned char* fileBytes;
 
 } ELF_STRUCT;
+
+typedef struct {
+	char name[256];
+	int offset1, size1, offset2, size2;
+	int newnum, numorigin;
+	int type, fusion, offset;
+} sect_tab;
 
 
 #endif 

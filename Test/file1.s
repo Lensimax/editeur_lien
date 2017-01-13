@@ -10,10 +10,6 @@
 	.eabi_attribute 34, 0
 	.eabi_attribute 18, 4
 	.file	"file1.c"
-	.section	.rodata
-	.align	2
-.LC0:
-	.ascii	"facto %d\012\000"
 	.text
 	.align	2
 	.global	main
@@ -27,17 +23,10 @@ main:
 	mov	r0, #3
 	bl	factoriel
 	str	r0, [fp, #-8]
-	ldr	r0, .L3
-	ldr	r1, [fp, #-8]
-	bl	printf
 	mov	r3, #0
 	mov	r0, r3
 	sub	sp, fp, #4
 	@ sp needed
 	ldmfd	sp!, {fp, pc}
-.L4:
-	.align	2
-.L3:
-	.word	.LC0
 	.size	main, .-main
 	.ident	"GCC: (4.8.2-14ubuntu1+6) 4.8.2"
