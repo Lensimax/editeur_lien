@@ -21,69 +21,53 @@
 void affichage_struct(ELF_STRUCT file);
 
 int main(int argc, char * argv[]){
-
+	
 	ELF_STRUCT file1;
 	ELF_STRUCT file2;
 	ELF_STRUCT res;
 	sect_tab *tab;
-
+	
 	int nombre_section_apres_fusion;
-
+	
 	FILE *fich;
-
-	if(argc == 1 || argc == 2 || argc == 3){
-		printf("\nEntrer au moins trois fichiers en argument le dernier etant le fichier resultat!!!!!!\n\n");
+	
+	if(argc == 1 || argc == 2 || argc == 3){	// Si il y a le bon nombre d'arguments
+	printf("\nEntrer au moins trois fichiers en argument le dernier etant le fichier resultat!!!!!!\n\n");
 	} else {
-
-		fich = fopen(argv[argc-1], "w");
-		strcpy(res.file_name,argv[argc-1]);
-		if(fich){
-			if(fill(&file1, argv[1]) && fill(&file2, argv[2])){
-
-
-
-				tab = malloc(sizeof(sect_tab));
-				res.shtab = malloc(sizeof(Elf32_Shdr));
-				res.symtab = malloc(sizeof(STRUCT_SYM));
-
-
-				tab = sectfusion(file1, file2, &res, tab);
-				nombre_section_apres_fusion=res.header->e_shnum;
-
-				
-
-				symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion);	
-				
-				fusion(file1,file2,&res,tab,nombre_section_apres_fusion);
-
-
-				res.fileBytes=readFileBytes(res.file_name);				
-
-				affichage_struct(res);
-
-
-
-			} else {
-				printf("[E] Erreur lors du remplissage \n");
-			}
-			
+	
+	fich = fopen(argv[argc-1], "w");
+	strcpy(res.file_name,argv[argc-1]);
+	if(fich){	// Si le fichier s'est  bien ouvert
+		if(fill(&file1, argv[1]) && fill(&file2, argv[2])){		// Remplissge des structures, et verification du bon fonctionnement de cette opération
+				///// ALLOCATION DES STRUCTURES /////
+		tab = malloc(sizeof(sect_tab));
+		res.shtab = malloc(sizeof(Elf32_Shdr));
+		res.symtab = malloc(sizeof(STRUCT_SYM));
+				///// FUSION DES SECTIONS /////
+		tab = sectfusion(file1, file2, &res, tab);
+		nombre_section_apres_fusion=res.header->e_shnum;
+				///// FUSION DES SYMBOLES /////
+		symbolfus(file1,file2, &res, tab, nombre_section_apres_fusion); 
+				///// CREATION DU FICHIER RESULTAT /////
+		fusion(file1,file2,&res,tab,nombre_section_apres_fusion);
+				///// AFFICHAGE DES INFORMATIONS DU FICHIER RESULTAT /////
+		res.fileBytes=readFileBytes(res.file_name);   
+		affichage_struct(res);
+		
 		} else {
-			printf("Erreur d\'ouverture du fichier resultat : %s\n", argv[3]);
+		
+		printf("[E] Erreur lors du remplissage \n");
+	
 		}
-
-		fclose(fich);
-		free(res.symtab);
-		free(res.shtab);
-		free(tab);
+	} else {
+		printf("Erreur d\'ouverture du fichier resultat : %s\n", argv[3]);
 	}
-
-
-
-
-
+	fclose(fich);
+	free(res.symtab);
+	free(res.shtab);
+	free(tab);
+	}
 	return 0;
-
-
 }
 
 
@@ -95,5 +79,5 @@ void affichage_struct(ELF_STRUCT file){
 	printf("\n\t\t\t[ Affichage des symboles ]\n\n");
 	aff_Symtable(file);
 	/*printf("\n\t\t\t[ Affichage des relocations ]\n\n");
-	aff_Reloc(file); */	
+	aff_Reloc(file); */ 
 }
