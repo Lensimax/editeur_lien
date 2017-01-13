@@ -42,5 +42,12 @@ typedef struct ELF_STRUCT {
 
 } ELF_STRUCT;
 
+typedef struct {
+	char name[256];
+	int offset1, size1, offset2, size2;
+	int newnum, numorigin;
+	int type, fusion, offset;
+} sect_tab;
+
 
 #endif 
