@@ -1,11 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <elf.h>
-#include "elfheader.h"
-#include "elfsectiontab.h"
-#include "elfsection.h"
-#include "elfsymbtab.h"
-#include "elfreloc.h"
+
 #include "fusion.h"
 
 

@@ -14,7 +14,6 @@
 #include "sectionfus.h"
 #include "filereader.h"
 #include "fill_struct.h"
-#include "filewriter.h"
 #include "symbolfus.h"
 #include "fusrel.h"
 

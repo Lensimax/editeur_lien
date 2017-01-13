@@ -21,7 +21,7 @@ printf(" %d \n",compteur_section_rel_final);
 
 }*/
 
-int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, int *nb){
+int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final){
 
 	int compteur_section_rel_final = 0;
 	int compteur_rel_par_section = 0;
@@ -174,7 +174,6 @@ int relfus(ELF_STRUCT file_1, ELF_STRUCT file_2, ELF_STRUCT * file_final, int *n
 		}
 	}*/
 
-	*nb = compteur_section_rel_final;	
 	
 return 0;
 }
