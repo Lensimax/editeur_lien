@@ -23,11 +23,11 @@ typedef struct STRUCT_SYM {
 
 typedef struct ELF_STRUCT {
 
-	FILE* file; // Nom du fichier, init en 1er
-	Elf32_Ehdr *header; //Elf header, init en 2e
-	Elf32_Shdr *shtab; // 4e
-	STRUCT_SYM *symtab; // 7e
-	STRUCT_REL * tabrel; // 8e
+	FILE* file;
+	Elf32_Ehdr *header; 
+	Elf32_Shdr *shtab;
+	STRUCT_SYM *symtab; 
+	STRUCT_REL * tabrel; 
 	
 
 	int indice_symtab;
